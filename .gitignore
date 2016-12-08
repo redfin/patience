@@ -1,0 +1,13 @@
+# First, ignore everything
+*
+
+# Allow git to track the main directory files
+!.gitignore
+!.travis.yml
+!pom.xml
+!README.md
+!LICENSE
+
+# Allow git to track the source directory and its contents
+!src/
+!src/**
