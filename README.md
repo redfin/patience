@@ -76,3 +76,4 @@ The `PatientRetryStrategy` is where the behavior around making calls to the `Cal
 This can include things like how long is waited after an unsuccessful attempt, etc.
 The `PatientExecutionHandler` is where the behavior around the extraction of a value from the given `Callable` and the
 testing of that value with the given filter `Predicate` is controlled.
+
