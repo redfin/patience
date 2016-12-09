@@ -60,7 +60,7 @@ final class PatientSleepTest implements NonInstantiableContract<PatientSleep> {
         Instant start = Instant.now();
         PatientSleep.sleepFor(duration);
         Instant end = Instant.now();
-        Assertions.assertTrue(Duration.between(start, end).compareTo(duration) > 0,
+        Assertions.assertTrue(Duration.between(start, end).compareTo(duration) >= 0,
                               "SleepFor should sleep for the given duration");
     }
 
