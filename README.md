@@ -20,7 +20,7 @@ occurs around those customization points.
 </dependency>
 ```
 
-## Main sections
+## Main classes
 
 The initial entry into the library is via a `PatientWait` object.
 This is an immutable instance, with a builder for easy and fluent object creation,
