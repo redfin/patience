@@ -16,7 +16,7 @@ occurs around those customization points.
 <dependency>
     <groupId>com.redfin</groupId>
     <artifactId>patience</artifactId>
-    <version>0.1.1-beta</version>
+    <version>0.2.0-beta</version>
 </dependency>
 ```
 
@@ -27,14 +27,14 @@ This is an immutable instance, with a builder for easy and fluent object creatio
  that contains the standard wait configurations.
 It is intended to be re-usable.
 
-Once you have created a `PatientWait` instance you start to make a wait call via a couple different methods.
-If you supply a filter (via a `Predicate`) you will get a `PatientCompletableFuture`.
-By giving a `PatientCompletableFuture` a `Callable<T>`, where the type `T` matches that of the predicate,
- you will get a `PatientFuture`. You can skip the `PatientCompletableFuture` by simply given a `Callable<T>` to
- the `PatientWait` instance in which case you will get a `PatientFuture` that has the default filter applied to it.
-The default filter considers any non-null, non-false object a valid result.
+Once you have created a `PatientWait` instance you start to make a wait call by supplying a `Callable`
+ to the `from` method of the `PatientWait` object instance. This will return a `DefaultPatientFuture`
+ instance. Either the `DefaultPatientFuture` or the `FilteredPatientFuture` objects allow you to extract
+ the value. Doing so from a `DefaultPatientFuture` object will use a default filter to test the returned
+ values that considers any non-null, non-false value to be a valid result. You can use a custom test
+ by calling the `withFilter` method on the `DefaultPatientFuture` object which will return a `FilteredPatientFuture`.
 
-You can then extract the value from the `PatientFuture` with the `get` methods.
+You can then extract the value from any `PatientFuture` object via the `get` methods.
 There are two, one that uses the default timeout (set in the `PatientWait`) or one that takes in a custom timeout.
 The `PatientFuture` will then either wait until a valid value is found and return it or throw a `PatientTimeoutException`
 if the timeout is reached without having found a valid value. It may return from the call earlier than the full timeout if
@@ -57,8 +57,8 @@ Then you can use that to wait for a condition:
 
 ```java
 String[] array = {"hello", "1", "a", "b", "c"};
-wait.withFilter(str -> null != str && str.length() > 1)
-    .from(() -> array[(int)(Math.random() * array.length)])
+wait.from(() -> array[(int)(Math.random() * array.length)])
+    .withFilter(t -> t.length() > 1)
     .get(Duration.ofMinutes(1));
 ```
 

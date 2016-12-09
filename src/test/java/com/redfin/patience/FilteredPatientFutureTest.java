@@ -19,19 +19,34 @@ package com.redfin.patience;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 
-final class PatientCompletableFutureTest {
+final class FilteredPatientFutureTest implements PatientFutureContract<FilteredPatientFuture<String>> {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Test constants & helpers
+    // Test contract requirement, constants & helpers
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private static final PatientWait WAIT = PatientWait.builder().build();
-    private static final Predicate<String> FILTER = t -> null != t && !t.isEmpty();
+    private static final Callable<String> CALLABLE = () -> "hello";
+    private static final Predicate<String> FILTER = t -> !t.isEmpty();
 
-    private PatientCompletableFuture<String> newInstance(PatientWait wait, Predicate<String> filter) {
-        return new PatientCompletableFuture<>(wait, filter);
+    @Override
+    public FilteredPatientFuture<String> getInstanceWithDefaultTimeout(Duration timeout) {
+        return new FilteredPatientFuture<>(PatientWait.builder().withDefaultTimeout(timeout).build(),
+                                           CALLABLE, FILTER);
+    }
+
+    @Override
+    public FilteredPatientFuture<String> getSuccessfulInstance() {
+        return new FilteredPatientFuture<>(WAIT, CALLABLE, FILTER);
+    }
+
+    @Override
+    public FilteredPatientFuture<String> getUnsuccessfulInstance() {
+        return new FilteredPatientFuture<>(WAIT, CALLABLE, String::isEmpty);
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -39,32 +54,20 @@ final class PatientCompletableFutureTest {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Test
-    void testCanInstantiate() {
-        Assertions.assertNotNull(newInstance(WAIT, FILTER),
-                                 "A PatientCompletableFuture should be able to be instantiated");
+    void testThrowsForNullWait() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                                () -> new FilteredPatientFuture<>(null, CALLABLE, FILTER));
     }
 
     @Test
-    void testThrowsForNullPatientWait() {
+    void testThrowsForNullCallable() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> newInstance(null, FILTER));
+                                () -> new FilteredPatientFuture<>(WAIT, null, FILTER));
     }
 
     @Test
     void testThrowsForNullFilter() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> newInstance(WAIT, null));
-    }
-
-    @Test
-    void testFromThrowsExceptionForNullCallable() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> newInstance(WAIT, FILTER).from(null));
-    }
-
-    @Test
-    void testFromReturnsNonNullForNonNullCallable() {
-        Assertions.assertNotNull(newInstance(WAIT, FILTER).from(() -> "hello"),
-                                 "PatientCompletableFuture should return a non-null PatientFuture with a non-null callable");
+                                () -> new FilteredPatientFuture<>(WAIT, CALLABLE, null));
     }
 }

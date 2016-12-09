@@ -20,23 +20,16 @@ import com.redfin.validity.Validity;
 
 import java.time.Duration;
 import java.util.concurrent.Callable;
-import java.util.function.Predicate;
 
 /**
  * A {@link PatientWait} instance is intended to be an immutable, pre-configured,
  * re-usable starting point for waiting for expected conditions. The normal way to
  * create one is via the static builder method {@link #builder()} and the subsequent
  * {@link PatientWaitBuilder#build()} method. Once a PatientWait instance has been
- * created it can be used repeatedly to create {@link PatientCompletableFuture} and
- * {@link PatientFuture} objects with the same initial configurations.
+ * created it can be used repeatedly to create {@link PatientFuture} objects with the
+ * same initial configurations.
  */
 public final class PatientWait {
-
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Constants
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    private static final Predicate<?> NON_NULL_NON_FALSE_PREDICATE = t -> null != t && (!(t instanceof Boolean) || (Boolean) t);
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Instance fields
@@ -55,7 +48,7 @@ public final class PatientWait {
      * Create a new {@link PatientWait} instance with the given values.
      *
      * @param initialDelay            the {@link Duration} to wait before attempting the first execution
-     *                                of the code given to the created {@link PatientCompletableFuture}s.
+     *                                of the code given to the created {@link DefaultPatientFuture}s.
      *                                May not be null or negative. A value of zero means don't wait
      *                                before attempting the first execution.
      * @param defaultTimeout          the default {@link Duration} maximum wait time for each {@link PatientFuture}
@@ -63,10 +56,10 @@ public final class PatientWait {
      *                                {@link PatientFuture#get()} method is called.
      *                                May not be null or negative.
      *                                A value of zero means only attempt one execution.
-     * @param patientRetryStrategy    the {@link PatientRetryStrategy} for all {@link PatientCompletableFuture} and
+     * @param patientRetryStrategy    the {@link PatientRetryStrategy} for all {@link DefaultPatientFuture} and
      *                                {@link PatientFuture}s created from this {@link PatientWait}.
      *                                May not be null.
-     * @param patientExecutionHandler the {@link PatientExecutionHandler} for all {@link PatientCompletableFuture}
+     * @param patientExecutionHandler the {@link PatientExecutionHandler} for all {@link DefaultPatientFuture}
      *                                and {@link PatientFuture}s created from this {@link PatientWait}.
      *                                May not be null.
      */
@@ -109,45 +102,24 @@ public final class PatientWait {
     }
 
     /**
-     * @param filter the {@link Predicate} used to test the results from the callable given
-     *               to the {@link PatientCompletableFuture#from(Callable)} method.
-     *               May not be null.
-     * @param <T>    the type of the predicate.
+     * Create a {@link DefaultPatientFuture} with the given callable. The default filter
+     * validates any non-null, non-false values returned from the callable.
      *
-     * @return a {@link PatientCompletableFuture} with this {@link PatientWait} instance
-     * and the given filter.
-     *
-     * @throws IllegalArgumentException if filter is null.
-     */
-    public <T> PatientCompletableFuture<T> withFilter(Predicate<T> filter) {
-        return new PatientCompletableFuture<>(this, filter);
-    }
-
-    /**
-     * This is the same as calling {@link #withFilter} with a predicate that returns true
-     * for all objects that are not null and not Boolean false and then calling the resulting
-     * {@link PatientCompletableFuture#from(Callable)} with the given callable.
-     *
-     * @param callable the {@link Callable} with which to create the {@link PatientFuture}.
+     * @param callable the {@link Callable} with which to create the {@link DefaultPatientFuture}.
      *                 May not be null.
      * @param <T>      the type of the value returned from the callable object.
      *
-     * @return a new {@link PatientFuture} instance with this {@link PatientWait} instance,
+     * @return a new {@link DefaultPatientFuture} instance with this {@link PatientWait} instance,
      * the given callable, and a predicate that returns true for all non-null, non-false values.
      */
-    public <T> PatientFuture<T> from(Callable<T> callable) {
-        PatientCompletableFuture<T> pcf = withFilter(getNonNullNonFalsePredicate());
-        return pcf.from(callable);
+    public <T> DefaultPatientFuture<T> from(Callable<T> callable) {
+        Validity.require().that(callable).isNotNull();
+        return new DefaultPatientFuture<>(this, callable);
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Static methods
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    @SuppressWarnings("unchecked")
-    private static <T> Predicate<T> getNonNullNonFalsePredicate() {
-        return (Predicate<T>) NON_NULL_NON_FALSE_PREDICATE;
-    }
 
     /**
      * @return a new {@link PatientWaitBuilder} instance with the default initial values set.

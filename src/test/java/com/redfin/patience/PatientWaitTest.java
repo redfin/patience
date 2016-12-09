@@ -141,18 +141,6 @@ final class PatientWaitTest {
     }
 
     @Test
-    void testWithFilterReturnsNonNullInstance() {
-        Assertions.assertNotNull(new PatientWait(INITIAL_DELAY, DEFAULT_TIMEOUT, PRS, PEH).withFilter(String::isEmpty),
-                                 "Should return a non null completable future with a valid filter");
-    }
-
-    @Test
-    void testWithFilterThrowsForNullPredicate() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> new PatientWait(INITIAL_DELAY, DEFAULT_TIMEOUT, PRS, PEH).withFilter(null));
-    }
-
-    @Test
     void testFromReturnsNonNullInstance() {
         Assertions.assertNotNull(new PatientWait(INITIAL_DELAY, DEFAULT_TIMEOUT, PRS, PEH).from(() -> "hello"),
                                  "Should return a non null future with a valid callable");

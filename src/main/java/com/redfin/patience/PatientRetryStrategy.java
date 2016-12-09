@@ -25,6 +25,7 @@ import java.util.function.Supplier;
  * It is where the actual retry logic customizations can occur. For example, if
  * you wanted a simple fixed delay versus exponential back off between attempts
  * of running the given code to be waited upon.
+ * <p>
  * Each call to a {@link PatientFuture#get(Duration)} method will make exactly one
  * call to the {@link #execute(Duration, Supplier)} method. Each execute call should
  * be considered a fresh wait attempt.
