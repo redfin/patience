@@ -62,9 +62,10 @@ public abstract class AbstractDelayPatientRetryStrategy implements PatientRetryS
         Validity.require().that(timeout).isGreaterThanOrEqualTo(Duration.ZERO);
         Validity.require().that(patientExecutionResultSupplier).isNotNull();
         // Capture the start time and calculate the end time
-        boolean stop = false;
         Instant start = Instant.now();
         Instant end = start.plus(timeout);
+        // Only execute once if the timeout is zero
+        boolean stop = timeout.isZero();
         // Begin attempting to get a result
         Supplier<Duration> delaySupplier = getDelayDurations();
         do {
