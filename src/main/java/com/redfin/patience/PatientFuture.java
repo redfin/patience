@@ -105,7 +105,7 @@ public final class PatientFuture<T> {
      *                                 {@link PatientExecutionHandler}.
      */
     public T get(Duration timeout) {
-        Validity.require().that(timeout).isGreaterThan(Duration.ZERO);
+        Validity.require().that(timeout).isGreaterThanOrEqualTo(Duration.ZERO);
         // Perform initial sleep if requested, then execute the retry attempts
         PatientSleep.sleepFor(wait.getInitialDelay());
         return wait.getRetryStrategy()

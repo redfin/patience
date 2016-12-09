@@ -41,6 +41,9 @@ public abstract class AbstractPatientExecutionHandler implements PatientExecutio
      * <p>
      * Any {@link Exception} thrown during the {@link Callable#call()} or {@link Predicate#test(Object)}
      * methods will be unhandled.
+     * <p>
+     * Note that this method doesn't check the arguments for null, the sub class caller should verify
+     * the arguments themselves.
      *
      * @param callable the {@link Callable} to retrieve values from.
      * @param filter   the {@link Predicate} to use to test values from the callable.
@@ -52,7 +55,7 @@ public abstract class AbstractPatientExecutionHandler implements PatientExecutio
      *                   testing the subsequent result with the given filter
      *                   {@link Predicate#test(Object)} throws an exception.
      */
-    protected <T> PatientExecutionResult<T> executeHelper(Callable<T> callable, Predicate<T> filter) throws Exception {
+    protected final <T> PatientExecutionResult<T> executeHelper(Callable<T> callable, Predicate<T> filter) throws Exception {
         // Extract and test the value from the callable, don't catch any throwables
         T result = callable.call();
         if (filter.test(result)) {
@@ -66,13 +69,16 @@ public abstract class AbstractPatientExecutionHandler implements PatientExecutio
 
     /**
      * @param thrown the {@link Exception} to wrap, if necessary.
+     *               May not be null.
      *
      * @return the given exception cast as a {@link RuntimeException}
      * if it is already one or a new {@link RuntimeException} with
      * the given exception as it's cause if it is not a
      * {@link RuntimeException}.
+     *
+     * @throws IllegalArgumentException if thrown is null.
      */
-    protected RuntimeException propagate(Exception thrown) {
+    protected final RuntimeException propagate(Exception thrown) {
         Validity.require().that(thrown).isNotNull();
         if (thrown instanceof RuntimeException) {
             return (RuntimeException) thrown;

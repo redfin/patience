@@ -58,7 +58,7 @@ public abstract class AbstractDelayPatientRetryStrategy implements PatientRetryS
     protected abstract Supplier<Duration> getDelayDurations();
 
     @Override
-    public <T> T execute(Duration timeout, Supplier<PatientExecutionResult<T>> patientExecutionResultSupplier) {
+    public final <T> T execute(Duration timeout, Supplier<PatientExecutionResult<T>> patientExecutionResultSupplier) {
         Validity.require().that(timeout).isGreaterThanOrEqualTo(Duration.ZERO);
         Validity.require().that(patientExecutionResultSupplier).isNotNull();
         // Capture the start time and calculate the end time

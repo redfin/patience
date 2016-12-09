@@ -32,12 +32,24 @@ import java.util.function.Predicate;
  */
 public final class PatientWait {
 
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Constants
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     private static final Predicate<?> NON_NULL_NON_FALSE_PREDICATE = t -> null != t && (!(t instanceof Boolean) || (Boolean) t);
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Instance fields
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private final Duration initialDelay;
     private final Duration defaultTimeout;
     private final PatientRetryStrategy patientRetryStrategy;
     private final PatientExecutionHandler patientExecutionHandler;
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Instance methods
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     /**
      * Create a new {@link PatientWait} instance with the given values.
@@ -63,7 +75,7 @@ public final class PatientWait {
                        PatientRetryStrategy patientRetryStrategy,
                        PatientExecutionHandler patientExecutionHandler) {
         this.initialDelay = Validity.require().that(initialDelay).isGreaterThanOrEqualTo(Duration.ZERO);
-        this.defaultTimeout = Validity.require().that(defaultTimeout).isStrictlyPositive();
+        this.defaultTimeout = Validity.require().that(defaultTimeout).isGreaterThanOrEqualTo(Duration.ZERO);
         this.patientRetryStrategy = Validity.require().that(patientRetryStrategy).isNotNull();
         this.patientExecutionHandler = Validity.require().that(patientExecutionHandler).isNotNull();
     }
@@ -128,6 +140,10 @@ public final class PatientWait {
         return pcf.from(callable);
     }
 
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Static methods
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     @SuppressWarnings("unchecked")
     private static <T> Predicate<T> getNonNullNonFalsePredicate() {
         return (Predicate<T>) NON_NULL_NON_FALSE_PREDICATE;
@@ -139,6 +155,10 @@ public final class PatientWait {
     public static PatientWaitBuilder builder() {
         return new PatientWaitBuilder();
     }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Builder
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     /**
      * A class used to create {@link PatientWait} instances.

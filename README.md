@@ -5,7 +5,7 @@
 
 ## Overview
 
-Patience is a fluent, customizable library for waiting on expected conditions.
+Patience is a fluent, customizable Java library for waiting on expected conditions.
 There are a few interfaces that allow for highly different behaviors at key
 sections along with immutable classes to implement the generic behavior that
 occurs around those customization points.

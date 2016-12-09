@@ -21,6 +21,10 @@ import org.junit.jupiter.api.Test;
 
 final class PatientTimeoutExceptionTest {
 
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Test cases
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     @Test
     void testCanInstantiateWithNoArguments() {
         Assertions.assertNotNull(new PatientTimeoutException(),

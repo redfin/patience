@@ -13,7 +13,7 @@
     <packaging>jar</packaging>
 
     <name>Patience</name>
-    <description>A Java library for waiting for expected conditions.</description>
+    <description>Patience is a fluent, customizable Java library for waiting on expected conditions.</description>
     <inceptionYear>2016</inceptionYear>
 
     <url>https://github.com/redfin/patience</url>
