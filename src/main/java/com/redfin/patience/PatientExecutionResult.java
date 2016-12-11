@@ -19,7 +19,6 @@ package com.redfin.patience;
 import com.redfin.validity.Validity;
 
 import java.util.NoSuchElementException;
-import java.util.function.Consumer;
 
 /**
  * An immutable container for results of running a Patient execution attempt.
@@ -31,64 +30,64 @@ import java.util.function.Consumer;
 public final class PatientExecutionResult<T> {
 
     private final T result;
-    private final boolean isPresent;
+    private final String failureDescription;
 
-    private PatientExecutionResult() {
-        this.result = null;
-        this.isPresent = false;
-    }
-
-    private PatientExecutionResult(T result) {
+    private PatientExecutionResult(T result, String failureDescription) {
         this.result = result;
-        this.isPresent = true;
+        this.failureDescription = failureDescription;
     }
 
     /**
      * If this is not a valid result this will throw an exception. You
-     * should call {@link #isPresent()} before calling this.
+     * should call {@link #wasSuccessful()} before calling this.
      *
      * @return the value contained in this result.
      * This may be null.
      *
-     * @throws NoSuchElementException if there is no result present.
+     * @throws NoSuchElementException if this is a failure result.
      */
-    public T get() {
-        if (!isPresent) {
-            throw new NoSuchElementException("No result present");
+    public T getSuccessResult() {
+        if (null != failureDescription) {
+            throw new NoSuchElementException("Cannot get a success value from a failed result");
         }
         return result;
     }
 
     /**
+     * If this is a valid result this will throw an exception. You
+     * should call {@link #wasSuccessful()} before calling this.
+     *
+     * @return the String description of the invalid result or swallowed
+     * exception.
+     *
+     * @throws NoSuchElementException if this is a successful result.
+     */
+    public String getFailureDescription() {
+        if (null == failureDescription) {
+            throw new NoSuchElementException("Cannot get a failure description from a success result");
+        }
+        return failureDescription;
+    }
+
+    /**
      * @return true if this was a success result.
      */
-    public boolean isPresent() {
-        return isPresent;
+    public boolean wasSuccessful() {
+        return null == failureDescription;
     }
 
     /**
-     * If this is a valid result, apply the result to the given consumer.
-     * If this isn't a valid result, do nothing.
-     *
-     * @param consumer the {@link Consumer} to apply a valid result to.
-     *                 May not be null.
-     *
-     * @throws IllegalArgumentException if consumer is null.
-     */
-    public void ifPresent(Consumer<T> consumer) {
-        Validity.require().that(consumer).isNotNull();
-        if (isPresent) {
-            consumer.accept(result);
-        }
-    }
-
-    /**
-     * @param <T> the type of the returned result instance.
+     * @param description the String description of the invalid result or swallowed exception.
+     *                    May not be null.
+     * @param <T>         the type of the returned result instance.
      *
      * @return a new, unsuccessful {@link PatientExecutionResult} instance.
+     *
+     * @throws IllegalArgumentException if description is null.
      */
-    public static <T> PatientExecutionResult<T> empty() {
-        return new PatientExecutionResult<>();
+    public static <T> PatientExecutionResult<T> failure(String description) {
+        Validity.require().that(description).isNotNull();
+        return new PatientExecutionResult<>(null, description);
     }
 
     /**
@@ -98,7 +97,7 @@ public final class PatientExecutionResult<T> {
      *
      * @return a new, successful {@link PatientExecutionResult} instance with the given value.
      */
-    public static <T> PatientExecutionResult<T> of(T result) {
-        return new PatientExecutionResult<>(result);
+    public static <T> PatientExecutionResult<T> success(T result) {
+        return new PatientExecutionResult<>(result, null);
     }
 }

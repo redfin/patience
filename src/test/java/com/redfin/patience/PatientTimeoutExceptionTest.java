@@ -19,6 +19,9 @@ package com.redfin.patience;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 final class PatientTimeoutExceptionTest {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -26,62 +29,44 @@ final class PatientTimeoutExceptionTest {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Test
-    void testCanInstantiateWithNoArguments() {
-        Assertions.assertNotNull(new PatientTimeoutException(),
-                                 "Should be able to instantiate a PatientTimeoutException with the zero argument constructor");
-    }
-
-    @Test
-    void testCanInstantiateWithMessage() {
-        Assertions.assertNotNull(new PatientTimeoutException("hello"),
-                                 "Should be able to instantiate a PatientTimeoutException with a non-null message");
+    void testCanIntantiateWithMessage() {
+        Assertions.assertNotNull(new PatientTimeoutException("hello", new ArrayList<>()),
+                                 "Should be able to instantiate a PatientTimeoutException with a message");
     }
 
     @Test
     void testCanInstantiateWithNullMessage() {
-        Assertions.assertNotNull(new PatientTimeoutException((String) null),
+        Assertions.assertNotNull(new PatientTimeoutException(null, new ArrayList<>()),
                                  "Should be able to instantiate a PatientTimeoutException with a null message");
     }
 
     @Test
-    void testCanInstantiateWithCause() {
-        Assertions.assertNotNull(new PatientTimeoutException(new RuntimeException("hello")),
-                                 "Should be able to instantiate a PatientTimeoutException with a non-null cause");
+    void testThrowsWithNullList() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                                () -> new PatientTimeoutException("hello", null));
     }
 
     @Test
-    void testCanInstantiateWithNullCause() {
-        Assertions.assertNotNull(new PatientTimeoutException((Throwable) null),
-                                 "Should be able to instantiate a PatientTimeoutException with a null cause");
+    void testReturnsGivenMessage() {
+        String message = "hello";
+        Assertions.assertEquals(message,
+                                new PatientTimeoutException(message, new ArrayList<>()).getMessage(),
+                                "A PatientTimeoutException should return the given message");
     }
 
     @Test
-    void testCanInstantiateWithMessageAndCause() {
-        Assertions.assertNotNull(new PatientTimeoutException("hello", new RuntimeException()),
-                                 "Should be able to instantiate a PatientTimeoutException with a message and cause");
+    void testReturnsGivenList() {
+        List<String> list = new ArrayList<>();
+        list.add("hello");
+        list.add("whoa");
+        Assertions.assertEquals(list,
+                                new PatientTimeoutException("hello", list).getAttemptDescriptions(),
+                                "A PatientTimeoutException should return the given attempt descriptions list");
     }
 
     @Test
-    void testCanInstantiateWithMessageAndNullCause() {
-        Assertions.assertNotNull(new PatientTimeoutException("hello", null),
-                                 "Should be able to instantiate a PatientTimeoutException with a message and null cause");
-    }
-
-    @Test
-    void testCanInstantiateWithCauseAndNullMessage() {
-        Assertions.assertNotNull(new PatientTimeoutException(null, new RuntimeException()),
-                                 "Should be able to instantiate a PatientTimeoutException with a cause and null message");
-    }
-
-    @Test
-    void testCanInstantiateWithNullMessageAndNullCause() {
-        Assertions.assertNotNull(new PatientTimeoutException(null, null),
-                                 "Should be able to instantiate a PatientTimeoutException with a null message and null cause");
-    }
-
-    @Test
-    void testCanBeInstantiatedWithFlags() {
-        Assertions.assertNotNull(new PatientTimeoutException("hello", new RuntimeException(), true, true),
-                                 "Should be able to instantiate a PatientTimeoutException with flags");
+    void testReturnsUnmodifiableList() {
+        Assertions.assertThrows(UnsupportedOperationException.class,
+                                () -> new PatientTimeoutException("hello", new ArrayList<>()).getAttemptDescriptions().add("hi"));
     }
 }

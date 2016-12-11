@@ -43,8 +43,8 @@ interface PatientRetryStrategyContract<T extends PatientRetryStrategy> {
      */
     T getInstance();
 
-    Supplier<PatientExecutionResult<String>> SUCCESS_RESULT_SUPPLIER = () -> PatientExecutionResult.of("hello");
-    Supplier<PatientExecutionResult<String>> FAILURE_RESULT_SUPPLIER = PatientExecutionResult::empty;
+    Supplier<PatientExecutionResult<String>> SUCCESS_RESULT_SUPPLIER = () -> PatientExecutionResult.success("hello");
+    Supplier<PatientExecutionResult<String>> FAILURE_RESULT_SUPPLIER = () -> PatientExecutionResult.failure("whoops");
 
     final class SuccessfulTrackingSupplier implements Supplier<PatientExecutionResult<String>> {
 
@@ -57,7 +57,7 @@ interface PatientRetryStrategyContract<T extends PatientRetryStrategy> {
         @Override
         public PatientExecutionResult<String> get() {
             counter++;
-            return PatientExecutionResult.of("hello");
+            return PatientExecutionResult.success("hello");
         }
     }
 
@@ -72,7 +72,7 @@ interface PatientRetryStrategyContract<T extends PatientRetryStrategy> {
         @Override
         public PatientExecutionResult<String> get() {
             counter++;
-            return PatientExecutionResult.empty();
+            return PatientExecutionResult.failure("whoops");
         }
     }
 

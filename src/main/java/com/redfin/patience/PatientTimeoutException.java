@@ -16,75 +16,59 @@
 
 package com.redfin.patience;
 
+import com.redfin.validity.Validity;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * A PatientTimeoutException is an unchecked exception. It is intended to signal that
  * a timeout was reached without receiving a valid value.
  */
 public class PatientTimeoutException extends RuntimeException {
 
-    static final long serialVersionUID = 0L;
+    static final long serialVersionUID = 1L;
+
+    private final List<String> attemptDescriptions;
 
     /**
-     * Constructs a new patience exception with {@code null} as its
-     * detail message and cause.
-     */
-    public PatientTimeoutException() {
-        super();
-    }
-
-    /**
-     * Constructs a new patience exception with the specified detail message.
+     * Constructs a new patience exception with the specified detail message,
+     * and the list of (string) descriptions of the unsuccessful attempts.
      * The cause will be {@code null}.
      *
-     * @param message the detail message. If {@code null} then it is the same
-     *                as calling {@link #PatientTimeoutException()}.
+     * @param message             the detail message.
+     *                            May be null.
+     * @param attemptDescriptions the list of String descriptions of the invalid
+     *                            results when waiting.
+     *                            May not be null.
+     *
+     * @throws IllegalArgumentException if attemptDescriptions is null.
      */
-    public PatientTimeoutException(String message) {
+    public PatientTimeoutException(String message, List<String> attemptDescriptions) {
         super(message);
+        Validity.require().that(attemptDescriptions).isNotNull();
+        // Make a copy of the list and make it unmodifiable
+        List<String> newList = new ArrayList<>(attemptDescriptions.size());
+        newList.addAll(attemptDescriptions);
+        this.attemptDescriptions = Collections.unmodifiableList(newList);
     }
 
     /**
-     * Constructs a new patience exception with the specified detail message and
-     * cause.
-     *
-     * @param message the detail message. If {@code null} then it is the same
-     *                as calling {@link #PatientTimeoutException(Throwable)}.
-     * @param cause   the cause of the exception. If {@code null} then it is the
-     *                same as calling {@link #PatientTimeoutException(String)}.
+     * @return the saved number of unsuccessful attempts
      */
-    public PatientTimeoutException(String message, Throwable cause) {
-        super(message, cause);
+    public int getNumberAttempts() {
+        return attemptDescriptions.size();
     }
 
     /**
-     * Constructs a new patience exception with the specified cause.
-     * The message will be {@code null}.
+     * The returned list will contain the descriptions of the unsuccessful results.
+     * If no descriptions were given then the list will be empty.
+     * The returned list is unmodifiable.
      *
-     * @param cause the cause of the exception. If {@code null} then it is the
-     *              same as calling {@link #PatientTimeoutException()}.
+     * @return the unmodifiable List of String descriptions of the unsuccessful results.
      */
-    public PatientTimeoutException(Throwable cause) {
-        super(cause);
-    }
-
-    /**
-     * Constructs a new patience exception with the specified detail
-     * message, cause, suppression enabled or disabled, and writable
-     * stack trace enabled or disabled.
-     *
-     * @param message            the detail message. If {@code null} then it is the
-     *                           same as having been not set.
-     * @param cause              the cause of the exception. If {@code null} then it is the
-     *                           same as having been not set.
-     * @param enableSuppression  whether or not suppression is enabled
-     *                           or disabled.
-     * @param writableStackTrace whether or not the stack trace should
-     *                           be writable.
-     */
-    protected PatientTimeoutException(String message,
-                                      Throwable cause,
-                                      boolean enableSuppression,
-                                      boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public List<String> getAttemptDescriptions() {
+        return attemptDescriptions;
     }
 }

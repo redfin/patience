@@ -86,10 +86,10 @@ final class AbstractPatientExecutionHandlerTest {
         PatientExecutionResult<String> result = getHandler().executeHelper(CALLABLE, PASSING_FILTER);
         Assertions.assertNotNull(result,
                                  "AbstractPatientExecutionHandler executeHelper shouldn't return a null result");
-        Assertions.assertTrue(result.isPresent(),
+        Assertions.assertTrue(result.wasSuccessful(),
                               "AbstractPatientExecutionHandler executeHelper should return a successful result for a passing filter");
         Assertions.assertEquals("hello",
-                                result.get(),
+                                result.getSuccessResult(),
                                 "AbstractPatientExecutionHandler executeHelper should return a result with the expected value for a passing filter");
     }
 
@@ -98,7 +98,7 @@ final class AbstractPatientExecutionHandlerTest {
         PatientExecutionResult<String> result = getHandler().executeHelper(CALLABLE, FAILING_FILTER);
         Assertions.assertNotNull(result,
                                  "AbstractPatientExecutionHandler executeHelper shouldn't return a null result");
-        Assertions.assertFalse(result.isPresent(),
+        Assertions.assertFalse(result.wasSuccessful(),
                                "AbstractPatientExecutionHandler executeHelper should return an unsuccessful result for a failing filter");
     }
 

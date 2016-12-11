@@ -16,7 +16,7 @@ occurs around those customization points.
 <dependency>
     <groupId>com.redfin</groupId>
     <artifactId>patience</artifactId>
-    <version>0.2.1-beta</version>
+    <version>0.3.0-beta</version>
 </dependency>
 ```
 

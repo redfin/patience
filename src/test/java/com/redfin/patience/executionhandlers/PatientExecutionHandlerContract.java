@@ -88,16 +88,16 @@ interface PatientExecutionHandlerContract<T extends PatientExecutionHandler> {
 
     @Test
     default void testHandlerReturnsSuccessfulResultForPassingValues_PatientExecutionHandlerContract() {
-        Assertions.assertTrue(getInstance().execute(CALLABLE, PASSING_FILTER).isPresent(),
+        Assertions.assertTrue(getInstance().execute(CALLABLE, PASSING_FILTER).wasSuccessful(),
                               "A PatientExecutionHandler should return a valid result for passing arguments");
-        Assertions.assertEquals(getInstance().execute(CALLABLE, PASSING_FILTER).get(),
+        Assertions.assertEquals(getInstance().execute(CALLABLE, PASSING_FILTER).getSuccessResult(),
                                 "hello",
                                 "A PatientExecutionHandler should return the expected result value");
     }
 
     @Test
     default void testHandlerReturnsUnsuccessfulResultForFailingValues_PatientExecutionHandlerContract() {
-        Assertions.assertFalse(getInstance().execute(CALLABLE, FAILING_FILTER).isPresent(),
+        Assertions.assertFalse(getInstance().execute(CALLABLE, FAILING_FILTER).wasSuccessful(),
                                "A PatientExecutionHandler should return an invalid result for failing arguments");
     }
 

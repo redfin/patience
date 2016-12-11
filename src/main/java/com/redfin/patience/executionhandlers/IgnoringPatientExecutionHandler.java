@@ -72,7 +72,7 @@ public class IgnoringPatientExecutionHandler extends AbstractPatientExecutionHan
         } catch (Exception thrown) {
             if (ignoredTypes.stream().anyMatch(clazz -> clazz.isAssignableFrom(thrown.getClass()))) {
                 // No result, but this type of exception is ignored so return an empty result
-                return PatientExecutionResult.empty();
+                return PatientExecutionResult.failure("Ignored exception -> " + thrown.toString());
             } else {
                 // The thrown exception is not ignored, propagate it
                 throw propagate(thrown);

@@ -19,6 +19,7 @@ package com.redfin.patience.executionhandlers;
 import com.redfin.patience.PatientExecutionHandler;
 import com.redfin.patience.PatientExecutionResult;
 import com.redfin.validity.Validity;
+import com.redfin.validity.ValidityUtils;
 
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
@@ -59,11 +60,11 @@ public abstract class AbstractPatientExecutionHandler implements PatientExecutio
         // Extract and test the value from the callable, don't catch any throwables
         T result = callable.call();
         if (filter.test(result)) {
-            // A valid value was found, return a non-empty result
-            return PatientExecutionResult.of(result);
+            // A valid value was found, return a success result
+            return PatientExecutionResult.success(result);
         } else {
-            // No valid value was found, return an empty result
-            return PatientExecutionResult.empty();
+            // No valid value was found, return a failure result
+            return PatientExecutionResult.failure(ValidityUtils.describe(result));
         }
     }
 

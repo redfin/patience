@@ -34,75 +34,70 @@ final class PatientExecutionResultTest {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Test
-    void testCanCreateEmptyResult() {
-        Assertions.assertNotNull(PatientExecutionResult.empty(),
-                                 "Should be able to create an empty result");
+    void testCanCreateFailureResult() {
+        Assertions.assertNotNull(PatientExecutionResult.failure(VALUE),
+                                 "Should be able to create a failure result");
     }
 
     @Test
-    void testCanCreateNonEmptyResultWithNull() {
-        Assertions.assertNotNull(PatientExecutionResult.of(null),
-                                 "Should be able to create a non-empty result with null");
-    }
-
-    @Test
-    void testCanCreateNonEmptyResultWithNonNull() {
-        Assertions.assertNotNull(PatientExecutionResult.of(VALUE),
-                                 "Should be able to create a non-empty result");
-    }
-
-    @Test
-    void testEmptyResultGetThrowsException() {
-        Assertions.assertThrows(NoSuchElementException.class,
-                                () -> PatientExecutionResult.empty().get());
-    }
-
-    @Test
-    void testEmptyResultIsPresentReturnsFalse() {
-        Assertions.assertFalse(PatientExecutionResult.empty().isPresent(),
-                               "An empty PatientExecutionResult should return false for isPresent");
-    }
-
-    @Test
-    void testEmptyResultIfPresentIgnoresConsumer() {
-        PatientExecutionResult.<String>empty().ifPresent(s -> {throw new RuntimeException(s);});
-    }
-
-    @Test
-    void testEmptyResultIfPresentThrowsForNullConsumer() {
+    void testFailureResultThrowsForNullDescription() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> PatientExecutionResult.empty().ifPresent(null));
+                                () -> PatientExecutionResult.failure(null));
     }
 
     @Test
-    void testNonEmptyResultGetReturnsGivenValue() {
+    void testCanCreateSuccessResultWithNull() {
+        Assertions.assertNotNull(PatientExecutionResult.success(null),
+                                 "Should be able to create a success result with null");
+    }
+
+    @Test
+    void testCanCreateSuccessResultWithNonNull() {
+        Assertions.assertNotNull(PatientExecutionResult.success(VALUE),
+                                 "Should be able to create a success result");
+    }
+
+    @Test
+    void testFailureResultGetSuccessResultThrowsException() {
+        Assertions.assertThrows(NoSuchElementException.class,
+                                () -> PatientExecutionResult.failure(VALUE).getSuccessResult());
+    }
+
+    @Test
+    void testFailureResultWasSuccessfulReturnsFalse() {
+        Assertions.assertFalse(PatientExecutionResult.failure(VALUE).wasSuccessful(),
+                               "A failure PatientExecutionResult should return false for wasSuccessful");
+    }
+
+    @Test
+    void testFailureResultGetFailureDescriptionReturnsGivenDescription() {
         Assertions.assertEquals(VALUE,
-                                PatientExecutionResult.of(VALUE).get(),
+                                PatientExecutionResult.failure(VALUE).getFailureDescription(),
+                                "A failure PatientExecutionResult should return the given failure description");
+    }
+
+    @Test
+    void testSuccessResultGetReturnsGivenValue() {
+        Assertions.assertEquals(VALUE,
+                                PatientExecutionResult.success(VALUE).getSuccessResult(),
                                 "A PatientExecutionResult with a value should return the given value");
     }
 
     @Test
-    void testNonEmptyResultGetReturnsGivenValueForNull() {
-        Assertions.assertNull(PatientExecutionResult.of(null).get(),
+    void testSuccessResultGetReturnsGivenValueForNull() {
+        Assertions.assertNull(PatientExecutionResult.success(null).getSuccessResult(),
                               "A PatientExecutionResult with a value of null should return null for get");
     }
 
     @Test
-    void testNonEmptyResultIsPresentReturnsTrue() {
-        Assertions.assertTrue(PatientExecutionResult.of(VALUE).isPresent(),
-                              "A non-empty PatientExecutionResult should return true for isPresent");
+    void testSuccessResultWasSuccessfulReturnsTrue() {
+        Assertions.assertTrue(PatientExecutionResult.success(VALUE).wasSuccessful(),
+                              "A non-empty PatientExecutionResult should return true for wasSuccessful");
     }
 
     @Test
-    void testNonEmptyResultIfPresentThrowsForNullConsumer() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> PatientExecutionResult.of(VALUE).ifPresent(null));
-    }
-
-    @Test
-    void testNonEmptyResultIfPresentConsumesGivenValue() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> PatientExecutionResult.of(VALUE)
-                                                            .ifPresent(s -> { if (s.equals(VALUE)) throw new IllegalArgumentException(); }));
+    void testSuccessResultGetFailureDescriptionThrows() {
+        Assertions.assertThrows(NoSuchElementException.class,
+                                () -> PatientExecutionResult.success(VALUE).getFailureDescription());
     }
 }

@@ -17,14 +17,16 @@
 package com.redfin.patience.retrystrategies;
 
 import com.redfin.patience.PatientException;
+import com.redfin.patience.PatientExecutionResult;
 import com.redfin.patience.PatientSleep;
 import com.redfin.patience.PatientTimeoutException;
-import com.redfin.patience.PatientExecutionResult;
 import com.redfin.patience.PatientRetryStrategy;
 import com.redfin.validity.Validity;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -68,14 +70,17 @@ public abstract class AbstractDelayPatientRetryStrategy implements PatientRetryS
         boolean stop = timeout.isZero();
         // Begin attempting to get a result
         Supplier<Duration> delaySupplier = getDelayDurations();
+        List<String> failureDescriptions = new ArrayList<>();
         do {
             // Begin attempting to get a result
             PatientExecutionResult<T> result = patientExecutionResultSupplier.get();
             if (null == result) {
                 throw new PatientException("Null value return from the result supplier");
             }
-            if (result.isPresent()) {
-                return result.get();
+            if (result.wasSuccessful()) {
+                return result.getSuccessResult();
+            } else {
+                failureDescriptions.add(result.getFailureDescription());
             }
             // The result wasn't a successful value, try again possibly
             Duration nextDelay = delaySupplier.get();
@@ -90,6 +95,6 @@ public abstract class AbstractDelayPatientRetryStrategy implements PatientRetryS
                 PatientSleep.sleepFor(nextDelay);
             }
         } while (!stop);
-        throw new PatientTimeoutException("No value was successfully retrieved within the timeout of " + timeout);
+        throw new PatientTimeoutException("No value was successfully retrieved within the timeout of " + timeout, failureDescriptions);
     }
 }
