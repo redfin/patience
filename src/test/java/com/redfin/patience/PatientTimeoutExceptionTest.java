@@ -55,6 +55,16 @@ final class PatientTimeoutExceptionTest {
     }
 
     @Test
+    void testReturnsAttemptCount() {
+        List<String> list = new ArrayList<>();
+        list.add("hello");
+        list.add("whoa");
+        Assertions.assertEquals(2,
+                                new PatientTimeoutException("hello", list).getAttemptsCount(),
+                                "A PatientTimeoutException should return the given attempt descriptions list");
+    }
+
+    @Test
     void testReturnsGivenList() {
         List<String> list = new ArrayList<>();
         list.add("hello");

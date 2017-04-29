@@ -57,7 +57,7 @@ public class PatientTimeoutException extends RuntimeException {
     /**
      * @return the saved number of unsuccessful attempts
      */
-    public int getNumberAttempts() {
+    public int getAttemptsCount() {
         return attemptDescriptions.size();
     }
 

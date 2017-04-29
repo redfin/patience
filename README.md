@@ -16,7 +16,7 @@ occurs around those customization points.
 <dependency>
     <groupId>com.redfin</groupId>
     <artifactId>patience</artifactId>
-    <version>0.3.0-beta</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
@@ -53,7 +53,7 @@ PatientWait wait = PatientWait.builder()
                               .build();
 ```
 
-Then you can use that to wait for a condition:
+Then you can use that (repeatedly) to wait for a condition:
 
 ```java
 String[] array = {"hello", "1", "a", "b", "c"};
@@ -62,7 +62,12 @@ wait.from(() -> array[(int)(Math.random() * array.length)])
     .get(Duration.ofMinutes(1));
 ```
 
-With the settings for the wait, this will make repeated attempts of calculating an index of the array
+Since the `PatientWait` object simply contains the handlers for retry behavior, execution handler, and timing
+the wait object can be reused. When the `from` method is called on `wait` it will return a new object that gets
+the information from `wait` and that is the object whose state is consumed by the repeated attempts. This does,
+however, assume that any handlers given to the `PatientWait` object are stateless between executions.
+
+In the above example, the `wait` object will make repeated attempts of calculating an index of the array
 and checking the String at that index against the filter that is checking for Strings with a length
 greater than 1. If one attempt returns a String with a length of 1, then it will wait for 500 milliseconds
 and then try again. Once the random index computation calculates 0 it will return the String `hello` and
@@ -72,8 +77,8 @@ will be thrown.
 ## Customization points
 
 The two main customization points of the `Patience` library are the `PatientRetryStrategy` and the `PatientExecutionHandler`.
-The `PatientRetryStrategy` is where the behavior around making calls to the `Callable` given in the `from` method are configured.
-This can include things like how long is waited after an unsuccessful attempt, etc.
+The `PatientRetryStrategy` is where the behavior around repeated executions of the `Callable` given in the `from` method on an unsuccessful attempt.
+This can include things like logging, changing how long to wait between attempts, etc.
 The `PatientExecutionHandler` is where the behavior around the extraction of a value from the given `Callable` and the
 testing of that value with the given filter `Predicate` is controlled.
 
