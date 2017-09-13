@@ -57,7 +57,7 @@ final class FixedDelayPatientRetryStrategyTest implements PatientRetryStrategyCo
     @Test
     void testFixedDelayRetryAlwaysReturnsGivenDuration() {
         Duration delay = Duration.ofMinutes(1);
-        Supplier<Duration> supplier = new FixedDelayPatientRetryStrategy(delay).getDelayDurations();
+        Supplier<Duration> supplier = new FixedDelayPatientRetryStrategy(delay).getDelayDurationsSupplier();
         for (int i = 0; i < 10; i++) {
             Assertions.assertEquals(delay,
                                     supplier.get(),

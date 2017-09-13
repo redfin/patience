@@ -16,11 +16,11 @@
 
 package com.redfin.patience;
 
-import com.redfin.validity.Validity;
-
 import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
+
+import static com.redfin.validity.Validity.validate;
 
 /**
  * An immutable container containing a {@link PatientWait} configuration instance
@@ -52,8 +52,8 @@ public final class DefaultPatientFuture<T> implements PatientFuture<T> {
      * @throws IllegalArgumentException if wait or filter are null.
      */
     DefaultPatientFuture(PatientWait wait, Callable<T> callable) {
-        this.wait = Validity.require().that(wait).isNotNull();
-        this.callable = Validity.require().that(callable).isNotNull();
+        this.wait = validate().that(wait).isNotNull();
+        this.callable = validate().that(callable).isNotNull();
     }
 
     /**
@@ -67,7 +67,7 @@ public final class DefaultPatientFuture<T> implements PatientFuture<T> {
      * @throws IllegalArgumentException if filter is null.
      */
     public FilteredPatientFuture<T> withFilter(Predicate<T> filter) {
-        Validity.require().that(filter).isNotNull();
+        validate().that(filter).isNotNull();
         return new FilteredPatientFuture<>(wait, callable, filter);
     }
 
@@ -78,7 +78,7 @@ public final class DefaultPatientFuture<T> implements PatientFuture<T> {
 
     @Override
     public T get(Duration timeout) {
-        Validity.require().that(timeout).isGreaterThanOrEqualTo(Duration.ZERO);
+        validate().that(timeout).isGreaterThanOrEqualTo(Duration.ZERO);
         return withFilter(getNonNullNonFalsePredicate()).get(timeout);
     }
 

@@ -18,11 +18,12 @@ package com.redfin.patience.executionhandlers;
 
 import com.redfin.patience.PatientExecutionHandler;
 import com.redfin.patience.PatientExecutionResult;
-import com.redfin.validity.Validity;
 import com.redfin.validity.ValidityUtils;
 
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
+
+import static com.redfin.validity.Validity.validate;
 
 /**
  * A class intended to be the super class of all implementations of the
@@ -57,7 +58,7 @@ public abstract class AbstractPatientExecutionHandler implements PatientExecutio
      *                   {@link Predicate#test(Object)} throws an exception.
      */
     protected final <T> PatientExecutionResult<T> executeHelper(Callable<T> callable, Predicate<T> filter) throws Exception {
-        // Extract and test the value from the callable, don't catch any throwables
+        // Extract and test the value from the callable, don't catch anything
         T result = callable.call();
         if (filter.test(result)) {
             // A valid value was found, return a success result
@@ -80,7 +81,7 @@ public abstract class AbstractPatientExecutionHandler implements PatientExecutio
      * @throws IllegalArgumentException if thrown is null.
      */
     protected final RuntimeException propagate(Exception thrown) {
-        Validity.require().that(thrown).isNotNull();
+        validate().that(thrown).isNotNull();
         if (thrown instanceof RuntimeException) {
             return (RuntimeException) thrown;
         } else {

@@ -17,10 +17,11 @@
 package com.redfin.patience.executionhandlers;
 
 import com.redfin.patience.PatientExecutionResult;
-import com.redfin.validity.Validity;
 
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
+
+import static com.redfin.validity.Validity.validate;
 
 /**
  * A simple, concrete sub class of the {@link AbstractPatientExecutionHandler}.
@@ -33,8 +34,8 @@ public class SimplePatientExecutionHandler extends AbstractPatientExecutionHandl
 
     @Override
     public <T> PatientExecutionResult<T> execute(Callable<T> callable, Predicate<T> filter) {
-        Validity.require().that(callable).isNotNull();
-        Validity.require().that(filter).isNotNull();
+        validate().that(callable).isNotNull();
+        validate().that(filter).isNotNull();
         try {
             return executeHelper(callable, filter);
         } catch (Exception exception) {

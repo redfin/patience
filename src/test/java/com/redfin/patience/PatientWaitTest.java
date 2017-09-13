@@ -58,8 +58,11 @@ final class PatientWaitTest {
 
     @Test
     void testCanInstantiate() {
-        Assertions.assertNotNull(new PatientWait(INITIAL_DELAY, DEFAULT_TIMEOUT, PRS, PEH),
-                                 "Should be able to instantiate a patient wait");
+        try {
+            new PatientWait(INITIAL_DELAY, DEFAULT_TIMEOUT, PRS, PEH);
+        } catch (Throwable thrown) {
+            throw new AssertionError("Should be able to instantiate a patient wait", thrown);
+        }
     }
 
     @Test
@@ -76,8 +79,11 @@ final class PatientWaitTest {
 
     @Test
     void testAllowsZeroInitialDelay() {
-        Assertions.assertNotNull(new PatientWait(Duration.ZERO, DEFAULT_TIMEOUT, PRS, PEH),
-                                 "Should be able to instantiate with a zero initial delay");
+        try {
+            new PatientWait(Duration.ZERO, DEFAULT_TIMEOUT, PRS, PEH);
+        } catch (Throwable thrown) {
+            throw new AssertionError("Should be able to instantiate with a zero initial delay", thrown);
+        }
     }
 
     @Test
@@ -94,8 +100,11 @@ final class PatientWaitTest {
 
     @Test
     void testAllowsZeroDefaultTimeout() {
-        Assertions.assertNotNull(new PatientWait(INITIAL_DELAY, Duration.ZERO, PRS, PEH),
-                                 "Should be able to instantiate with a zero initial delay");
+        try {
+            new PatientWait(INITIAL_DELAY, Duration.ZERO, PRS, PEH);
+        } catch (Throwable thrown) {
+            throw new AssertionError("Should be able to instantiate with a zero initial delay", thrown);
+        }
     }
 
     @Test

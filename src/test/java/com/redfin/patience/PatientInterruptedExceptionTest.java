@@ -27,61 +27,99 @@ final class PatientInterruptedExceptionTest {
 
     @Test
     void testCanInstantiateWithNoArguments() {
-        Assertions.assertNotNull(new PatientInterruptedException(),
-                                 "Should be able to instantiate a PatientInterruptedException with the zero argument constructor");
+        Assertions.assertThrows(PatientInterruptedException.class,
+                                () -> {
+                                    throw new PatientInterruptedException();
+                                },
+                                "Should be able to instantiate a PatientInterruptedException with the zero argument constructor");
     }
 
     @Test
     void testCanInstantiateWithMessage() {
-        Assertions.assertNotNull(new PatientInterruptedException("hello"),
-                                 "Should be able to instantiate a PatientInterruptedException with a non-null message");
+        Assertions.assertThrows(PatientInterruptedException.class,
+                                () -> {
+                                    throw new PatientInterruptedException("hello");
+                                },
+                                "Should be able to instantiate a PatientInterruptedException with a non-null message");
     }
 
     @Test
     void testCanInstantiateWithNullMessage() {
-        Assertions.assertNotNull(new PatientInterruptedException((String) null),
-                                 "Should be able to instantiate a PatientInterruptedException with a null message");
+        Assertions.assertThrows(PatientInterruptedException.class,
+                                () -> {
+                                    throw new PatientInterruptedException((String) null);
+                                },
+                                "Should be able to instantiate a PatientInterruptedException with a null message");
     }
 
     @Test
     void testCanInstantiateWithCause() {
-        Assertions.assertNotNull(new PatientInterruptedException(new RuntimeException("hello")),
-                                 "Should be able to instantiate a PatientInterruptedException with a non-null cause");
+        Assertions.assertThrows(PatientInterruptedException.class,
+                                () -> {
+                                    throw new PatientInterruptedException(new RuntimeException("hello"));
+                                },
+                                "Should be able to instantiate a PatientInterruptedException with a non-null cause");
     }
 
     @Test
     void testCanInstantiateWithNullCause() {
-        Assertions.assertNotNull(new PatientInterruptedException((Throwable) null),
-                                 "Should be able to instantiate a PatientInterruptedException with a null cause");
+        Assertions.assertThrows(PatientInterruptedException.class,
+                                () -> {
+                                    throw new PatientInterruptedException((Throwable) null);
+                                },
+                                "Should be able to instantiate a PatientInterruptedException with a null cause");
     }
 
     @Test
     void testCanInstantiateWithMessageAndCause() {
-        Assertions.assertNotNull(new PatientInterruptedException("hello", new RuntimeException()),
-                                 "Should be able to instantiate a PatientInterruptedException with a message and cause");
+        Assertions.assertThrows(PatientInterruptedException.class,
+                                () -> {
+                                    throw new PatientInterruptedException("hello", new RuntimeException());
+                                },
+                                "Should be able to instantiate a PatientInterruptedException with a message and cause");
     }
 
     @Test
     void testCanInstantiateWithMessageAndNullCause() {
-        Assertions.assertNotNull(new PatientInterruptedException("hello", null),
-                                 "Should be able to instantiate a PatientInterruptedException with a message and null cause");
+        Assertions.assertThrows(PatientInterruptedException.class,
+                                () -> {
+                                    throw new PatientInterruptedException("hello", null);
+                                },
+                                "Should be able to instantiate a PatientInterruptedException with a message and null cause");
     }
 
     @Test
     void testCanInstantiateWithCauseAndNullMessage() {
-        Assertions.assertNotNull(new PatientInterruptedException(null, new RuntimeException()),
-                                 "Should be able to instantiate a PatientInterruptedException with a cause and null message");
+        Assertions.assertThrows(PatientInterruptedException.class,
+                                () -> {
+                                    throw new PatientInterruptedException(null, new RuntimeException());
+                                },
+                                "Should be able to instantiate a PatientInterruptedException with a cause and null message");
     }
 
     @Test
     void testCanInstantiateWithNullMessageAndNullCause() {
-        Assertions.assertNotNull(new PatientInterruptedException(null, null),
-                                 "Should be able to instantiate a PatientInterruptedException with a null message and null cause");
+        Assertions.assertThrows(PatientInterruptedException.class,
+                                () -> {
+                                    throw new PatientInterruptedException(null, null);
+                                },
+                                "Should be able to instantiate a PatientInterruptedException with a null message and null cause");
     }
 
     @Test
     void testCanBeInstantiatedWithFlags() {
-        Assertions.assertNotNull(new PatientInterruptedException("hello", new RuntimeException(), true, true),
-                                 "Should be able to instantiate a PatientInterruptedException with flags");
+        Assertions.assertThrows(PatientInterruptedException.class,
+                                () -> {
+                                    throw new PatientInterruptedException("hello", new RuntimeException(), true, true);
+                                },
+                                "Should be able to instantiate a PatientInterruptedException with flags");
     }
-}
+
+    @Test
+    void testCanBeInstantiatedWithFlagsAndNullMessage() {
+        Assertions.assertThrows(PatientInterruptedException.class,
+                                () -> {
+                                    throw new PatientInterruptedException(null, new RuntimeException(), false, false);
+                                },
+                                "Should be able to instantiate a PatientInterruptedException with flags and a null message");
+    }}

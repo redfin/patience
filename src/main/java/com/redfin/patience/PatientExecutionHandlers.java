@@ -18,10 +18,11 @@ package com.redfin.patience;
 
 import com.redfin.patience.executionhandlers.IgnoringPatientExecutionHandler;
 import com.redfin.patience.executionhandlers.SimplePatientExecutionHandler;
-import com.redfin.validity.Validity;
 
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
+
+import static com.redfin.validity.Validity.validate;
 
 /**
  * A non-instantiable class that wraps creation
@@ -62,7 +63,7 @@ public final class PatientExecutionHandlers {
     @SafeVarargs
     public static IgnoringPatientExecutionHandler ignoring(Class<? extends Exception> exceptionType,
                                                            Class<? extends Exception>... exceptionTypes) {
-        Validity.require().that(exceptionType).isNotNull();
+        validate().that(exceptionType).isNotNull();
         return new IgnoringPatientExecutionHandler(exceptionType,
                                                    exceptionTypes);
     }

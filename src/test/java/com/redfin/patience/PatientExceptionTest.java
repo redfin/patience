@@ -27,61 +27,100 @@ final class PatientExceptionTest {
 
     @Test
     void testCanInstantiateWithNoArguments() {
-        Assertions.assertNotNull(new PatientException(),
-                                 "Should be able to instantiate a PatientException with the zero argument constructor");
+        Assertions.assertThrows(PatientException.class,
+                                () -> {
+                                    throw new PatientException();
+                                },
+                                "Should be able to instantiate a PatientException with the zero argument constructor");
     }
 
     @Test
     void testCanInstantiateWithMessage() {
-        Assertions.assertNotNull(new PatientException("hello"),
-                                 "Should be able to instantiate a PatientException with a non-null message");
+        Assertions.assertThrows(PatientException.class,
+                                () -> {
+                                    throw new PatientException("hello");
+                                },
+                                "Should be able to instantiate a PatientException with a non-null message");
     }
 
     @Test
     void testCanInstantiateWithNullMessage() {
-        Assertions.assertNotNull(new PatientException((String) null),
-                                 "Should be able to instantiate a PatientException with a null message");
+        Assertions.assertThrows(PatientException.class,
+                                () -> {
+                                    throw new PatientException((String) null);
+                                },
+                                "Should be able to instantiate a PatientException with a null message");
     }
 
     @Test
     void testCanInstantiateWithCause() {
-        Assertions.assertNotNull(new PatientException(new RuntimeException("hello")),
-                                 "Should be able to instantiate a PatientException with a non-null cause");
+        Assertions.assertThrows(PatientException.class,
+                                () -> {
+                                    throw new PatientException(new RuntimeException("hello"));
+                                },
+                                "Should be able to instantiate a PatientException with a non-null cause");
     }
 
     @Test
     void testCanInstantiateWithNullCause() {
-        Assertions.assertNotNull(new PatientException((Throwable) null),
-                                 "Should be able to instantiate a PatientException with a null cause");
+        Assertions.assertThrows(PatientException.class,
+                                () -> {
+                                    throw new PatientException((Throwable) null);
+                                },
+                                "Should be able to instantiate a PatientException with a null cause");
     }
 
     @Test
     void testCanInstantiateWithMessageAndCause() {
-        Assertions.assertNotNull(new PatientException("hello", new RuntimeException()),
-                                 "Should be able to instantiate a PatientException with a message and cause");
+        Assertions.assertThrows(PatientException.class,
+                                () -> {
+                                    throw new PatientException("hello", new RuntimeException());
+                                },
+                                "Should be able to instantiate a PatientException with a message and cause");
     }
 
     @Test
     void testCanInstantiateWithMessageAndNullCause() {
-        Assertions.assertNotNull(new PatientException("hello", null),
-                                 "Should be able to instantiate a PatientException with a message and null cause");
+        Assertions.assertThrows(PatientException.class,
+                                () -> {
+                                    throw new PatientException("hello", null);
+                                },
+                                "Should be able to instantiate a PatientException with a message and null cause");
     }
 
     @Test
     void testCanInstantiateWithCauseAndNullMessage() {
-        Assertions.assertNotNull(new PatientException(null, new RuntimeException()),
-                                 "Should be able to instantiate a PatientException with a cause and null message");
+        Assertions.assertThrows(PatientException.class,
+                                () -> {
+                                    throw new PatientException(null, new RuntimeException());
+                                },
+                                "Should be able to instantiate a PatientException with a cause and null message");
     }
 
     @Test
     void testCanInstantiateWithNullMessageAndNullCause() {
-        Assertions.assertNotNull(new PatientException(null, null),
-                                 "Should be able to instantiate a PatientException with a null message and null cause");
+        Assertions.assertThrows(PatientException.class,
+                                () -> {
+                                    throw new PatientException(null, null);
+                                },
+                                "Should be able to instantiate a PatientException with a null message and null cause");
     }
 
     @Test
     void testCanBeInstantiatedWithFlags() {
-        Assertions.assertNotNull(new PatientException("hello", new RuntimeException(), true, true),
-                                 "Should be able to instantiate a PatientException with flags");
+        Assertions.assertThrows(PatientException.class,
+                                () -> {
+                                    throw new PatientException("hello", new RuntimeException(), true, true);
+                                },
+                                "Should be able to instantiate a PatientException with flags");
+    }
+
+    @Test
+    void testCanBeInstantiatedWithFlagsAndNullMessage() {
+        Assertions.assertThrows(PatientException.class,
+                                () -> {
+                                    throw new PatientException(null, new RuntimeException(), false, false);
+                                },
+                                "Should be able to instantiate a PatientException with flags and a null message");
     }
 }

@@ -71,7 +71,7 @@ final class ExponentialDelayPatientRetryStrategyTest implements PatientRetryStra
     void testExponentialDelayReturnsExpectedDurations() {
         Duration initialDelay = Duration.ofMillis(100);
         int base = 2;
-        Supplier<Duration> supplier = new ExponentialDelayPatientRetryStrategy(base, initialDelay).getDelayDurations();
+        Supplier<Duration> supplier = new ExponentialDelayPatientRetryStrategy(base, initialDelay).getDelayDurationsSupplier();
         for (int i = 0; i < 10; i++) {
             Assertions.assertEquals(initialDelay.multipliedBy((long) Math.pow(base, i)),
                                     supplier.get(),

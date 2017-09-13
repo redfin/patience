@@ -16,9 +16,9 @@
 
 package com.redfin.patience;
 
-import com.redfin.validity.Validity;
-
 import java.time.Duration;
+
+import static com.redfin.validity.Validity.validate;
 
 /**
  * A non-instantiable class that contains methods for sleeping
@@ -45,11 +45,12 @@ public final class PatientSleep {
      * @see Thread#sleep(long)
      */
     public static void sleepFor(Duration duration) {
-        Validity.require().that(duration).isGreaterThanOrEqualTo(Duration.ZERO);
+        validate().that(duration).isGreaterThanOrEqualTo(Duration.ZERO);
         if (!duration.isZero()) {
             try {
                 Thread.sleep(duration.toMillis());
             } catch (InterruptedException interrupted) {
+                Thread.currentThread().interrupt();
                 throw new PatientInterruptedException(String.format("Thread sleeping for [ %s ] was interrupted.",
                                                                     duration),
                                                       interrupted);

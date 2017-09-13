@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.NoSuchElementException;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 final class PatientExecutionResultTest {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

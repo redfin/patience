@@ -21,13 +21,14 @@ import com.redfin.patience.PatientExecutionResult;
 import com.redfin.patience.PatientSleep;
 import com.redfin.patience.PatientTimeoutException;
 import com.redfin.patience.PatientRetryStrategy;
-import com.redfin.validity.Validity;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+
+import static com.redfin.validity.Validity.validate;
 
 /**
  * A class intended to be the super class of all delay between implementations of the
@@ -52,24 +53,25 @@ public abstract class AbstractDelayPatientRetryStrategy implements PatientRetryS
      * {@link Supplier#get()} method called multiple times by a single execute invocation.
      * <p>
      * If the {@link Supplier#get()} method ever returns a null or negative {@link Duration}
-     * then a {@link PatientException} will be thrown.
+     * during an {@link #execute(Duration, Supplier)} call, then a {@link PatientException}
+     * will be thrown.
      *
      * @return a new {@link Duration} {@link Supplier} for the current execution of
      * the {@link #execute(Duration, Supplier)} method.
      */
-    protected abstract Supplier<Duration> getDelayDurations();
+    protected abstract Supplier<Duration> getDelayDurationsSupplier();
 
     @Override
     public final <T> T execute(Duration timeout, Supplier<PatientExecutionResult<T>> patientExecutionResultSupplier) {
-        Validity.require().that(timeout).isGreaterThanOrEqualTo(Duration.ZERO);
-        Validity.require().that(patientExecutionResultSupplier).isNotNull();
+        validate().that(timeout).isGreaterThanOrEqualTo(Duration.ZERO);
+        validate().that(patientExecutionResultSupplier).isNotNull();
         // Capture the start time and calculate the end time
         Instant start = Instant.now();
         Instant end = start.plus(timeout);
         // Only execute once if the timeout is zero
         boolean stop = timeout.isZero();
         // Begin attempting to get a result
-        Supplier<Duration> delaySupplier = getDelayDurations();
+        Supplier<Duration> delaySupplier = getDelayDurationsSupplier();
         List<String> failureDescriptions = new ArrayList<>();
         do {
             // Begin attempting to get a result

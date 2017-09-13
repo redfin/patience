@@ -16,10 +16,10 @@
 
 package com.redfin.patience.retrystrategies;
 
-import com.redfin.validity.Validity;
-
 import java.time.Duration;
 import java.util.function.Supplier;
+
+import static com.redfin.validity.Validity.validate;
 
 /**
  * A concrete implementation of the {@link AbstractDelayPatientRetryStrategy} that calculates
@@ -44,12 +44,12 @@ public class ExponentialDelayPatientRetryStrategy extends AbstractDelayPatientRe
      *                                  or equal to zero.
      */
     public ExponentialDelayPatientRetryStrategy(int base, Duration initialDelay) {
-        this.base = Validity.require().that(base).isStrictlyPositive();
-        this.initialDelay = Validity.require().that(initialDelay).isStrictlyPositive();
+        this.base = validate().that(base).isStrictlyPositive();
+        this.initialDelay = validate().that(initialDelay).isStrictlyPositive();
     }
 
     @Override
-    protected Supplier<Duration> getDelayDurations() {
+    protected Supplier<Duration> getDelayDurationsSupplier() {
         return new Supplier<Duration>() {
 
             private int currentCount = 0;

@@ -16,9 +16,9 @@
 
 package com.redfin.patience;
 
-import com.redfin.validity.Validity;
-
 import java.util.NoSuchElementException;
+
+import static com.redfin.validity.Validity.validate;
 
 /**
  * An immutable container for results of running a Patient execution attempt.
@@ -86,7 +86,7 @@ public final class PatientExecutionResult<T> {
      * @throws IllegalArgumentException if description is null.
      */
     public static <T> PatientExecutionResult<T> failure(String description) {
-        Validity.require().that(description).isNotNull();
+        validate().that(description).isNotNull();
         return new PatientExecutionResult<>(null, description);
     }
 

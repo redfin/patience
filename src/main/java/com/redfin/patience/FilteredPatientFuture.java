@@ -16,11 +16,11 @@
 
 package com.redfin.patience;
 
-import com.redfin.validity.Validity;
-
 import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
+
+import static com.redfin.validity.Validity.validate;
 
 /**
  * An immutable container holding all the information needed to retry a
@@ -55,9 +55,9 @@ public final class FilteredPatientFuture<T> implements PatientFuture<T> {
      * @throws IllegalArgumentException if wait, callable, or filter are null.
      */
     FilteredPatientFuture(PatientWait wait, Callable<T> callable, Predicate<T> filter) {
-        this.wait = Validity.require().that(wait).isNotNull();
-        this.callable = Validity.require().that(callable).isNotNull();
-        this.filter = Validity.require().that(filter).isNotNull();
+        this.wait = validate().that(wait).isNotNull();
+        this.callable = validate().that(callable).isNotNull();
+        this.filter = validate().that(filter).isNotNull();
     }
 
     @Override
@@ -67,7 +67,7 @@ public final class FilteredPatientFuture<T> implements PatientFuture<T> {
 
     @Override
     public T get(Duration timeout) {
-        Validity.require().that(timeout).isGreaterThanOrEqualTo(Duration.ZERO);
+        validate().that(timeout).isGreaterThanOrEqualTo(Duration.ZERO);
         // Perform initial sleep if requested, then execute the retry attempts
         PatientSleep.sleepFor(wait.getInitialDelay());
         return wait.getRetryStrategy()

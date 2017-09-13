@@ -16,10 +16,10 @@
 
 package com.redfin.patience.retrystrategies;
 
-import com.redfin.validity.Validity;
-
 import java.time.Duration;
 import java.util.function.Supplier;
+
+import static com.redfin.validity.Validity.validate;
 
 /**
  * A concrete implementation of the {@link AbstractDelayPatientRetryStrategy} that simply
@@ -43,11 +43,11 @@ public class FixedDelayPatientRetryStrategy extends AbstractDelayPatientRetryStr
      * @throws IllegalArgumentException if delayBetween is null or negative.
      */
     public FixedDelayPatientRetryStrategy(Duration delay) {
-        this.delay = Validity.require().that(delay).isGreaterThanOrEqualTo(Duration.ZERO);
+        this.delay = validate().that(delay).isGreaterThanOrEqualTo(Duration.ZERO);
     }
 
     @Override
-    protected Supplier<Duration> getDelayDurations() {
+    protected Supplier<Duration> getDelayDurationsSupplier() {
         return () -> delay;
     }
 }

@@ -57,6 +57,6 @@ final class PatientExecutionHandlersTest implements NonInstantiableContract<Pati
     @Test
     void testIgnoringDoesNotThrowForNullExceptionTypesArray() {
         PatientExecutionHandlers.ignoring(IllegalArgumentException.class,
-                                          null);
+                                          (Class<? extends Exception>[]) null);
     }
 }

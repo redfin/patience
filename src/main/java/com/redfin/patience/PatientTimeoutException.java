@@ -16,11 +16,11 @@
 
 package com.redfin.patience;
 
-import com.redfin.validity.Validity;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static com.redfin.validity.Validity.validate;
 
 /**
  * A PatientTimeoutException is an unchecked exception. It is intended to signal that
@@ -47,7 +47,7 @@ public class PatientTimeoutException extends RuntimeException {
      */
     public PatientTimeoutException(String message, List<String> attemptDescriptions) {
         super(message);
-        Validity.require().that(attemptDescriptions).isNotNull();
+        validate().that(attemptDescriptions).isNotNull();
         // Make a copy of the list and make it unmodifiable
         List<String> newList = new ArrayList<>(attemptDescriptions.size());
         newList.addAll(attemptDescriptions);

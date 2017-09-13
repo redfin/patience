@@ -43,7 +43,7 @@ final class IgnoringPatientExecutionHandlerTest implements PatientExecutionHandl
 
     @Test
     void testDoesNotThrowForNullExceptionTypes() {
-        new IgnoringPatientExecutionHandler(IllegalArgumentException.class, null);
+        new IgnoringPatientExecutionHandler(IllegalArgumentException.class, (Class<? extends Exception>[]) null);
     }
 
     @Test

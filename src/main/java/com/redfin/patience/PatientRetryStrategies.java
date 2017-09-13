@@ -18,9 +18,10 @@ package com.redfin.patience;
 
 import com.redfin.patience.retrystrategies.ExponentialDelayPatientRetryStrategy;
 import com.redfin.patience.retrystrategies.FixedDelayPatientRetryStrategy;
-import com.redfin.validity.Validity;
 
 import java.time.Duration;
+
+import static com.redfin.validity.Validity.validate;
 
 /**
  * A non-instantiable class that wraps creation
@@ -39,7 +40,7 @@ public final class PatientRetryStrategies {
      * @throws IllegalArgumentException if delay is null or negative.
      */
     public static PatientRetryStrategy withFixedDelay(Duration delay) {
-        return new FixedDelayPatientRetryStrategy(Validity.require().that(delay).isGreaterThanOrEqualTo(Duration.ZERO));
+        return new FixedDelayPatientRetryStrategy(validate().that(delay).isGreaterThanOrEqualTo(Duration.ZERO));
     }
 
     /**
@@ -55,8 +56,8 @@ public final class PatientRetryStrategies {
      *                                  or equal to zero.
      */
     public static PatientRetryStrategy withExponentialDelay(int base, Duration initialDelay) {
-        return new ExponentialDelayPatientRetryStrategy(Validity.require().that(base).isStrictlyPositive(),
-                                                        Validity.require().that(initialDelay).isStrictlyPositive());
+        return new ExponentialDelayPatientRetryStrategy(validate().that(base).isStrictlyPositive(),
+                                                        validate().that(initialDelay).isStrictlyPositive());
     }
 
     /*

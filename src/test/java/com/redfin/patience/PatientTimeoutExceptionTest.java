@@ -29,15 +29,21 @@ final class PatientTimeoutExceptionTest {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Test
-    void testCanIntantiateWithMessage() {
-        Assertions.assertNotNull(new PatientTimeoutException("hello", new ArrayList<>()),
-                                 "Should be able to instantiate a PatientTimeoutException with a message");
+    void testCanInstantiateWithMessage() {
+        Assertions.assertThrows(PatientTimeoutException.class,
+                                () -> {
+                                    throw new PatientTimeoutException("hello", new ArrayList<>());
+                                },
+                                "Should be able to instantiate a PatientTimeoutException with valid arguments.");
     }
 
     @Test
     void testCanInstantiateWithNullMessage() {
-        Assertions.assertNotNull(new PatientTimeoutException(null, new ArrayList<>()),
-                                 "Should be able to instantiate a PatientTimeoutException with a null message");
+        Assertions.assertThrows(PatientTimeoutException.class,
+                                () -> {
+                                    throw new PatientTimeoutException(null, new ArrayList<>());
+                                },
+                                "Should be able to instantiate a PatientTimeoutException with a null message.");
     }
 
     @Test

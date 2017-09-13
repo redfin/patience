@@ -16,10 +16,10 @@
 
 package com.redfin.patience;
 
-import com.redfin.validity.Validity;
-
 import java.time.Duration;
 import java.util.concurrent.Callable;
+
+import static com.redfin.validity.Validity.validate;
 
 /**
  * A {@link PatientWait} instance is intended to be an immutable, pre-configured,
@@ -67,10 +67,10 @@ public final class PatientWait {
                        Duration defaultTimeout,
                        PatientRetryStrategy patientRetryStrategy,
                        PatientExecutionHandler patientExecutionHandler) {
-        this.initialDelay = Validity.require().that(initialDelay).isGreaterThanOrEqualTo(Duration.ZERO);
-        this.defaultTimeout = Validity.require().that(defaultTimeout).isGreaterThanOrEqualTo(Duration.ZERO);
-        this.patientRetryStrategy = Validity.require().that(patientRetryStrategy).isNotNull();
-        this.patientExecutionHandler = Validity.require().that(patientExecutionHandler).isNotNull();
+        this.initialDelay = validate().that(initialDelay).isGreaterThanOrEqualTo(Duration.ZERO);
+        this.defaultTimeout = validate().that(defaultTimeout).isGreaterThanOrEqualTo(Duration.ZERO);
+        this.patientRetryStrategy = validate().that(patientRetryStrategy).isNotNull();
+        this.patientExecutionHandler = validate().that(patientExecutionHandler).isNotNull();
     }
 
     /**
@@ -113,7 +113,7 @@ public final class PatientWait {
      * the given callable, and a predicate that returns true for all non-null, non-false values.
      */
     public <T> DefaultPatientFuture<T> from(Callable<T> callable) {
-        Validity.require().that(callable).isNotNull();
+        validate().that(callable).isNotNull();
         return new DefaultPatientFuture<>(this, callable);
     }
 
@@ -158,7 +158,7 @@ public final class PatientWait {
          * @return a self reference.
          */
         public PatientWaitBuilder withInitialDelay(Duration initialDelay) {
-            this.initialDelay = Validity.require().that(initialDelay).isGreaterThanOrEqualTo(Duration.ZERO);
+            this.initialDelay = validate().that(initialDelay).isGreaterThanOrEqualTo(Duration.ZERO);
             return this;
         }
 
@@ -175,7 +175,7 @@ public final class PatientWait {
          * @throws IllegalArgumentException if defaultTimeout is null, zero, or negative.
          */
         public PatientWaitBuilder withDefaultTimeout(Duration defaultTimeout) {
-            this.defaultTimeout = Validity.require().that(defaultTimeout).isGreaterThanOrEqualTo(Duration.ZERO);
+            this.defaultTimeout = validate().that(defaultTimeout).isGreaterThanOrEqualTo(Duration.ZERO);
             return this;
         }
 
@@ -188,7 +188,7 @@ public final class PatientWait {
          * @throws IllegalArgumentException if patientRetryStrategy is null.
          */
         public PatientWaitBuilder withRetryStrategy(PatientRetryStrategy patientRetryStrategy) {
-            this.patientRetryStrategy = Validity.require().that(patientRetryStrategy).isNotNull();
+            this.patientRetryStrategy = validate().that(patientRetryStrategy).isNotNull();
             return this;
         }
 
@@ -201,7 +201,7 @@ public final class PatientWait {
          * @throws IllegalArgumentException if patientExecutionHandler is null.
          */
         public PatientWaitBuilder withExecutionHandler(PatientExecutionHandler patientExecutionHandler) {
-            this.patientExecutionHandler = Validity.require().that(patientExecutionHandler).isNotNull();
+            this.patientExecutionHandler = validate().that(patientExecutionHandler).isNotNull();
             return this;
         }
 

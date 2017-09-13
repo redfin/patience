@@ -17,13 +17,14 @@
 package com.redfin.patience.executionhandlers;
 
 import com.redfin.patience.PatientExecutionResult;
-import com.redfin.validity.Validity;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
+
+import static com.redfin.validity.Validity.validate;
 
 /**
  * An immutable sub class of the {@link AbstractPatientExecutionHandler}. It catches
@@ -55,7 +56,7 @@ public class IgnoringPatientExecutionHandler extends AbstractPatientExecutionHan
     @SafeVarargs
     public IgnoringPatientExecutionHandler(Class<? extends Exception> exceptionType,
                                            Class<? extends Exception>... exceptionTypes) {
-        Validity.require().that(exceptionType).isNotNull();
+        validate().that(exceptionType).isNotNull();
         ignoredTypes = new HashSet<>();
         ignoredTypes.add(exceptionType);
         if (null != exceptionTypes && exceptionTypes.length > 0) {
@@ -65,8 +66,8 @@ public class IgnoringPatientExecutionHandler extends AbstractPatientExecutionHan
 
     @Override
     public <T> PatientExecutionResult<T> execute(Callable<T> callable, Predicate<T> filter) {
-        Validity.require().that(callable).isNotNull();
-        Validity.require().that(filter).isNotNull();
+        validate().that(callable).isNotNull();
+        validate().that(filter).isNotNull();
         try {
             return executeHelper(callable, filter);
         } catch (Exception thrown) {

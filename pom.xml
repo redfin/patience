@@ -8,7 +8,7 @@
 
     <groupId>com.redfin</groupId>
     <artifactId>patience</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
 
@@ -90,7 +90,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>2.2.1</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -103,7 +102,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9.1</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -116,7 +114,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -130,7 +127,6 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.7</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>
@@ -143,14 +139,96 @@
         </profile>
     </profiles>
 
-    <!-- Regular Build Settings -->
+    <dependencyManagement>
+
+        <!-- Code Dependency - Version Management -->
+
+        <dependencies>
+            <dependency>
+                <groupId>com.redfin</groupId>
+                <artifactId>validity</artifactId>
+                <version>3.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>5.0.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
+
+        <!-- Maven Plugin Version Management -->
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                    <version>2.9</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.2.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.10.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>1.5</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonatype.plugins</groupId>
+                    <artifactId>nexus-staging-maven-plugin</artifactId>
+                    <version>1.6.7</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.4.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugin</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.19</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.junit.platform</groupId>
+                            <artifactId>junit-platform-surefire-provider</artifactId>
+                            <version>1.0.0</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.junit.jupiter</groupId>
+                            <artifactId>junit-jupiter-engine</artifactId>
+                            <version>5.0.0</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <!-- Regular Build Settings -->
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.4.1</version>
                 <executions>
                     <execution>
                         <id>enforce-maven</id>
@@ -183,7 +261,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
                 <configuration>
                     <source>${min.java.version}</source>
                     <target>${min.java.version}</target>
@@ -192,14 +269,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.junit.platform</groupId>
-                        <artifactId>junit-platform-surefire-provider</artifactId>
-                        <version>1.0.0-M4</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>
@@ -211,7 +280,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.4</version>
+                <configuration>
+                    <quiet>true</quiet>
+                </configuration>
                 <reportSets>
                     <reportSet>
                         <id>default</id>
@@ -227,20 +298,23 @@
         </plugins>
     </reporting>
 
-    <!-- Dependencies -->
+    <!-- Dependency - Declaration -->
 
     <dependencies>
+
+        <!-- Jar Dependencies -->
+
         <dependency>
             <groupId>com.redfin</groupId>
             <artifactId>validity</artifactId>
-            <version>2.4.0</version>
         </dependency>
+
+        <!-- Test Dependencies -->
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.0.0-M4</version>
+            <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>
