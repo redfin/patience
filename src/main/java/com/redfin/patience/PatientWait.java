@@ -25,7 +25,7 @@ import static com.redfin.validity.Validity.validate;
  * A {@link PatientWait} instance is intended to be an immutable, pre-configured,
  * re-usable starting point for waiting for expected conditions. The normal way to
  * create one is via the static builder method {@link #builder()} and the subsequent
- * {@link PatientWaitBuilder#build()} method. Once a PatientWait instance has been
+ * {@link Builder#build()} method. Once a PatientWait instance has been
  * created it can be used repeatedly to create {@link PatientFuture} objects with the
  * same initial configurations.
  */
@@ -122,10 +122,10 @@ public final class PatientWait {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     /**
-     * @return a new {@link PatientWaitBuilder} instance with the default initial values set.
+     * @return a new {@link Builder} instance with the default initial values set.
      */
-    public static PatientWaitBuilder builder() {
-        return new PatientWaitBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -135,7 +135,7 @@ public final class PatientWait {
     /**
      * A class used to create {@link PatientWait} instances.
      */
-    public static final class PatientWaitBuilder {
+    public static final class Builder {
 
         private static final PatientRetryStrategy DEFAULT_STRATEGY = PatientRetryStrategies.withFixedDelay(Duration.ZERO);
         private static final PatientExecutionHandler DEFAULT_HANDLER = PatientExecutionHandlers.simpleHandler();
@@ -157,7 +157,7 @@ public final class PatientWait {
          *
          * @return a self reference.
          */
-        public PatientWaitBuilder withInitialDelay(Duration initialDelay) {
+        public Builder withInitialDelay(Duration initialDelay) {
             this.initialDelay = validate().that(initialDelay).isGreaterThanOrEqualTo(Duration.ZERO);
             return this;
         }
@@ -174,7 +174,7 @@ public final class PatientWait {
          *
          * @throws IllegalArgumentException if defaultTimeout is null, zero, or negative.
          */
-        public PatientWaitBuilder withDefaultTimeout(Duration defaultTimeout) {
+        public Builder withDefaultTimeout(Duration defaultTimeout) {
             this.defaultTimeout = validate().that(defaultTimeout).isGreaterThanOrEqualTo(Duration.ZERO);
             return this;
         }
@@ -187,7 +187,7 @@ public final class PatientWait {
          *
          * @throws IllegalArgumentException if patientRetryStrategy is null.
          */
-        public PatientWaitBuilder withRetryStrategy(PatientRetryStrategy patientRetryStrategy) {
+        public Builder withRetryStrategy(PatientRetryStrategy patientRetryStrategy) {
             this.patientRetryStrategy = validate().that(patientRetryStrategy).isNotNull();
             return this;
         }
@@ -200,14 +200,14 @@ public final class PatientWait {
          *
          * @throws IllegalArgumentException if patientExecutionHandler is null.
          */
-        public PatientWaitBuilder withExecutionHandler(PatientExecutionHandler patientExecutionHandler) {
+        public Builder withExecutionHandler(PatientExecutionHandler patientExecutionHandler) {
             this.patientExecutionHandler = validate().that(patientExecutionHandler).isNotNull();
             return this;
         }
 
         /**
          * @return the {@link PatientWait} instance with the current values of this
-         * {@link PatientWaitBuilder} instance.
+         * {@link Builder} instance.
          */
         public PatientWait build() {
             return new PatientWait(initialDelay,

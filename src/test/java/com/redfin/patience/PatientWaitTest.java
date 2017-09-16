@@ -146,7 +146,7 @@ final class PatientWaitTest {
     @Test
     void testCanInstantiateBuilder() {
         Assertions.assertNotNull(PatientWait.builder(),
-                                 "Static builder method should return a PatientWaitBuilder instance");
+                                 "Static builder method should return a Builder instance");
     }
 
     @Test
@@ -162,14 +162,14 @@ final class PatientWaitTest {
     }
 
     // --------------------------------------------------------------
-    // PatientWaitBuilder test cases
+    // Builder test cases
     // --------------------------------------------------------------
 
     @Nested
     final class PatientWaitBuilderTest {
 
-        private PatientWait.PatientWaitBuilder getInstance() {
-            return new PatientWait.PatientWaitBuilder();
+        private PatientWait.Builder getInstance() {
+            return new PatientWait.Builder();
         }
 
         @Test
@@ -226,38 +226,38 @@ final class PatientWaitTest {
 
         @Test
         void testBuilderStartsWithExpectedDefaultInitialDelay() {
-            PatientWait wait = new PatientWait.PatientWaitBuilder().build();
+            PatientWait wait = new PatientWait.Builder().build();
             Assertions.assertEquals(Duration.ZERO,
                                     wait.getInitialDelay(),
-                                    "PatientWaitBuilder should have given the wait the default initial delay");
+                                    "Builder should have given the wait the default initial delay");
             Assertions.assertEquals(Duration.ZERO,
                                     wait.getDefaultTimeout(),
-                                    "PatientWaitBuilder should have given the wait the default default timeout");
+                                    "Builder should have given the wait the default default timeout");
             Assertions.assertTrue(wait.getRetryStrategy() instanceof FixedDelayPatientRetryStrategy,
-                                  "PatientWaitBuilder should have given the wait the default retry strategy");
+                                  "Builder should have given the wait the default retry strategy");
             Assertions.assertTrue(wait.getExecutionHandler() instanceof SimplePatientExecutionHandler,
-                                  "PatientWaitBuilder should have given the wait the default execution handler");
+                                  "Builder should have given the wait the default execution handler");
         }
 
         @Test
         void testBuilderTransfersGivenValuesToPatientWait() {
-            PatientWait wait = new PatientWait.PatientWaitBuilder().withInitialDelay(INITIAL_DELAY)
-                                                                   .withDefaultTimeout(DEFAULT_TIMEOUT)
-                                                                   .withRetryStrategy(PRS)
-                                                                   .withExecutionHandler(PEH)
-                                                                   .build();
+            PatientWait wait = new PatientWait.Builder().withInitialDelay(INITIAL_DELAY)
+                                                        .withDefaultTimeout(DEFAULT_TIMEOUT)
+                                                        .withRetryStrategy(PRS)
+                                                        .withExecutionHandler(PEH)
+                                                        .build();
             Assertions.assertEquals(INITIAL_DELAY,
                                     wait.getInitialDelay(),
-                                    "PatientWaitBuilder should have given the wait the expected initial delay");
+                                    "Builder should have given the wait the expected initial delay");
             Assertions.assertEquals(DEFAULT_TIMEOUT,
                                     wait.getDefaultTimeout(),
-                                    "PatientWaitBuilder should have given the wait the expected default timeout");
+                                    "Builder should have given the wait the expected default timeout");
             Assertions.assertEquals(PRS,
                                     wait.getRetryStrategy(),
-                                    "PatientWaitBuilder should have given the wait the expected retry strategy");
+                                    "Builder should have given the wait the expected retry strategy");
             Assertions.assertEquals(PEH,
                                     wait.getExecutionHandler(),
-                                    "PatientWaitBuilder should have given the wait the expected execution handler");
+                                    "Builder should have given the wait the expected execution handler");
         }
     }
 }
