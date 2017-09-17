@@ -10,9 +10,9 @@ addons:
       - oracle-java8-installer
 
 install:
-  - mvn install -DskipTests
+  - mvn clean install -DskipTests
 script:
-  - mvn test
+  - mvn clean test
 
 notifications:
   email: false
