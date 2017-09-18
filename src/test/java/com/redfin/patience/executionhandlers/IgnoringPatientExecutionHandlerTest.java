@@ -64,6 +64,14 @@ final class IgnoringPatientExecutionHandlerTest implements PatientExecutionHandl
     }
 
     @Test
+    void testPropagatesNonIgnoredException() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                                () -> getInstance().execute(() -> { throw new IllegalArgumentException("Whoops"); },
+                                                            PASSING_FILTER),
+                                "Expected to propagate a non-ignored throwable");
+    }
+
+    @Test
     void testSwallowsIgnoredCheckedException() {
         IgnoringPatientExecutionHandler executionHandler = new IgnoringPatientExecutionHandler(PatientExecutionHandlerContract.ContractCheckedException.class);
         executionHandler.execute(() -> {

@@ -53,11 +53,11 @@ public abstract class AbstractPatientExecutionHandler implements PatientExecutio
      *
      * @return the {@link PatientExecutionResult} for this attempt.
      *
-     * @throws Exception if calling {@link Callable#call()} on the given callable or
+     * @throws Throwable if calling {@link Callable#call()} on the given callable or
      *                   testing the subsequent result with the given filter
-     *                   {@link Predicate#test(Object)} throws an exception.
+     *                   {@link Predicate#test(Object)} throws.
      */
-    protected final <T> PatientExecutionResult<T> executeHelper(Callable<T> callable, Predicate<T> filter) throws Exception {
+    protected final <T> PatientExecutionResult<T> executeHelper(Callable<T> callable, Predicate<T> filter) throws Throwable {
         // Extract and test the value from the callable, don't catch anything
         T result = callable.call();
         if (filter.test(result)) {
@@ -70,7 +70,7 @@ public abstract class AbstractPatientExecutionHandler implements PatientExecutio
     }
 
     /**
-     * @param thrown the {@link Exception} to wrap, if necessary.
+     * @param thrown the {@link Throwable} to wrap, if necessary.
      *               May not be null.
      *
      * @return the given exception cast as a {@link RuntimeException}
@@ -80,7 +80,7 @@ public abstract class AbstractPatientExecutionHandler implements PatientExecutio
      *
      * @throws IllegalArgumentException if thrown is null.
      */
-    protected final RuntimeException propagate(Exception thrown) {
+    protected final RuntimeException propagate(Throwable thrown) {
         validate().that(thrown).isNotNull();
         if (thrown instanceof RuntimeException) {
             return (RuntimeException) thrown;

@@ -16,6 +16,11 @@
 
 package com.redfin.patience.executionhandlers;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.Callable;
+
 final class SimplePatientExecutionHandlerTest implements PatientExecutionHandlerContract<SimplePatientExecutionHandler> {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -25,5 +30,25 @@ final class SimplePatientExecutionHandlerTest implements PatientExecutionHandler
     @Override
     public SimplePatientExecutionHandler getInstance() {
         return new SimplePatientExecutionHandler();
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Test cases
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    @Test
+    void testHandlerPropagatesThrowableFromCallableViaCastingForUnchecked() {
+        // Verify the exception is thrown without wrapping
+        Callable<String> callable = () -> { throw new ContractUncheckedException(); };
+        Assertions.assertThrows(ContractUncheckedException.class,
+                                () -> getInstance().execute(callable, PASSING_FILTER));
+    }
+
+    @Test
+    void testHandlerPropagatesThrowableFromCallableViaWrappingForChecked() {
+        // Verify the exception is thrown, wrapped in a runtime exception
+        Callable<String> callable = () -> { throw new ContractCheckedException(); };
+        Assertions.assertThrows(RuntimeException.class,
+                                () -> getInstance().execute(callable, PASSING_FILTER));
     }
 }

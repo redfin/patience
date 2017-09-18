@@ -70,7 +70,7 @@ public class IgnoringPatientExecutionHandler extends AbstractPatientExecutionHan
         validate().that(filter).isNotNull();
         try {
             return executeHelper(callable, filter);
-        } catch (Exception thrown) {
+        } catch (Throwable thrown) {
             if (ignoredTypes.stream().anyMatch(clazz -> clazz.isAssignableFrom(thrown.getClass()))) {
                 // No result, but this type of exception is ignored so return an empty result
                 return PatientExecutionResult.failure("Ignored exception -> " + thrown.toString());

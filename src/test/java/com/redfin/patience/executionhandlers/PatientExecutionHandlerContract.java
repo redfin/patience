@@ -100,20 +100,4 @@ interface PatientExecutionHandlerContract<T extends PatientExecutionHandler> {
         Assertions.assertFalse(getInstance().execute(CALLABLE, FAILING_FILTER).wasSuccessful(),
                                "A PatientExecutionHandler should return an invalid result for failing arguments");
     }
-
-    @Test
-    default void testHandlerPropagatesThrowableFromCallableViaCastingForUnchecked_PatientExecutionHandlerContract() {
-        // Verify the exception is thrown without wrapping
-        Callable<String> callable = () -> { throw new ContractUncheckedException(); };
-        Assertions.assertThrows(ContractUncheckedException.class,
-                                () -> getInstance().execute(callable, PASSING_FILTER));
-    }
-
-    @Test
-    default void testHandlerPropagatesThrowableFromCallableViaWrappingForChecked_PatientExecutionHandlerContract() {
-        // Verify the exception is thrown, wrapped in a runtime exception
-        Callable<String> callable = () -> { throw new ContractCheckedException(); };
-        Assertions.assertThrows(RuntimeException.class,
-                                () -> getInstance().execute(callable, PASSING_FILTER));
-    }
 }

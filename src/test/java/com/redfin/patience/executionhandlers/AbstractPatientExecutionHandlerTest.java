@@ -82,7 +82,7 @@ final class AbstractPatientExecutionHandlerTest {
     }
 
     @Test
-    void testExecuteHelperReturnsSuccessfulResultForPassingValue() throws Exception {
+    void testExecuteHelperReturnsSuccessfulResultForPassingValue() throws Throwable {
         PatientExecutionResult<String> result = getHandler().executeHelper(CALLABLE, PASSING_FILTER);
         Assertions.assertNotNull(result,
                                  "AbstractPatientExecutionHandler executeHelper shouldn't return a null result");
@@ -94,7 +94,7 @@ final class AbstractPatientExecutionHandlerTest {
     }
 
     @Test
-    void testExecuteHelperReturnsUnsuccessfulForFailingValue() throws Exception {
+    void testExecuteHelperReturnsUnsuccessfulForFailingValue() throws Throwable {
         PatientExecutionResult<String> result = getHandler().executeHelper(CALLABLE, FAILING_FILTER);
         Assertions.assertNotNull(result,
                                  "AbstractPatientExecutionHandler executeHelper shouldn't return a null result");

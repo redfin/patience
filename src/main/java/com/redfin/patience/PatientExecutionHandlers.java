@@ -16,6 +16,7 @@
 
 package com.redfin.patience;
 
+import com.redfin.patience.executionhandlers.IgnoringAllPatientExecutionHandler;
 import com.redfin.patience.executionhandlers.IgnoringPatientExecutionHandler;
 import com.redfin.patience.executionhandlers.SimplePatientExecutionHandler;
 
@@ -32,11 +33,12 @@ import static com.redfin.validity.Validity.validate;
 public final class PatientExecutionHandlers {
 
     /*
-     * The simple execution handler doesn't contain any state
-     * so it may be re-used safely.
+     * Some execution handler don't contain any state
+     * so they may be re-used safely.
      */
 
     private static final SimplePatientExecutionHandler SIMPLE = new SimplePatientExecutionHandler();
+    private static final IgnoringAllPatientExecutionHandler IGNORING_ALL = new IgnoringAllPatientExecutionHandler();
 
     /**
      * @return a new {@link SimplePatientExecutionHandler} instance.
@@ -66,6 +68,13 @@ public final class PatientExecutionHandlers {
         validate().that(exceptionType).isNotNull();
         return new IgnoringPatientExecutionHandler(exceptionType,
                                                    exceptionTypes);
+    }
+
+    /**
+     * @return a new {@link IgnoringAllPatientExecutionHandler} instance.
+     */
+    public static IgnoringAllPatientExecutionHandler ignoringAll() {
+        return IGNORING_ALL;
     }
 
     /*

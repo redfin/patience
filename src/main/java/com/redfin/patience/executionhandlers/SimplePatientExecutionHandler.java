@@ -38,10 +38,10 @@ public class SimplePatientExecutionHandler extends AbstractPatientExecutionHandl
         validate().that(filter).isNotNull();
         try {
             return executeHelper(callable, filter);
-        } catch (Exception exception) {
+        } catch (Throwable thrown) {
             // An execution occurred during the code execution or testing of a result,
             // propagate the error
-            throw propagate(exception);
+            throw propagate(thrown);
         }
     }
 }
