@@ -16,31 +16,31 @@
 
 package com.redfin.patience;
 
-final class PatientExceptionTest
- implements ExceptionContract<PatientException> {
+final class PatientExecutionExceptionTest
+ implements ExceptionContract<PatientExecutionException> {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Test constants, requirements, and helpers
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Override
-    public PatientException getInstance() {
-        return new PatientException();
+    public PatientExecutionException getInstance() {
+        return new PatientExecutionException();
     }
 
     @Override
-    public PatientException getInstance(String message) {
-        return new PatientException(message);
+    public PatientExecutionException getInstance(String message) {
+        return new PatientExecutionException(message);
     }
 
     @Override
-    public PatientException getInstance(Throwable cause) {
-        return new PatientException(cause);
+    public PatientExecutionException getInstance(Throwable cause) {
+        return new PatientExecutionException(cause);
     }
 
     @Override
-    public PatientException getInstance(String message,
-                                        Throwable cause) {
-        return new PatientException(message, cause);
+    public PatientExecutionException getInstance(String message,
+                                                 Throwable cause) {
+        return new PatientExecutionException(message, cause);
     }
 }

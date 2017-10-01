@@ -16,248 +16,283 @@
 
 package com.redfin.patience;
 
-import com.redfin.patience.executionhandlers.SimplePatientExecutionHandler;
-import com.redfin.patience.retrystrategies.FixedDelayPatientRetryStrategy;
+import com.redfin.patience.executions.SimpleExecutionHandler;
+import com.redfin.patience.retries.FixedDelayPatientRetryHandler;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
-import java.util.concurrent.Callable;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 final class PatientWaitTest {
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Test constants & helpers
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Test constants, requirements, and helpers
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    private static final Duration INITIAL_DELAY = Duration.ofMillis(100);
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofMillis(100);
-    private static final PatientRetryStrategy PRS = new PatientRetryStrategy() {
-        @Override
-        public <T> T execute(Duration timeout, Supplier<PatientExecutionResult<T>> patientExecutionResultSupplier) {
-            return null;
-        }
-    };
-    private static final PatientExecutionHandler PEH = new PatientExecutionHandler() {
-        @Override
-        public <T> PatientExecutionResult<T> execute(Callable<T> callable, Predicate<T> filter) {
-            return null;
-        }
-    };
+    private static final Duration POSITIVE_DURATION;
+    private static final Duration NEGATIVE_DURATION;
+    private static final PatientExecutionHandler EXECUTION_HANDLER;
+    private static final PatientRetryHandler RETRY_HANDLER;
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    static {
+        POSITIVE_DURATION = Duration.ofMillis(500);
+        NEGATIVE_DURATION = Duration.ofMillis(-500);
+        EXECUTION_HANDLER = PatientExecutionHandlers.simple();
+        RETRY_HANDLER = PatientRetryHandlers.fixedDelay(Duration.ofMillis(500));
+    }
+
+    private PatientWait getInstance(Duration initialDelay,
+                                    Duration defaultTimeout,
+                                    PatientExecutionHandler executionHandler,
+                                    PatientRetryHandler retryHandler) {
+        return new PatientWait(initialDelay,
+                               defaultTimeout,
+                               executionHandler,
+                               retryHandler);
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Test cases
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // --------------------------------------------------------------
-    // PatientWait test cases
-    // --------------------------------------------------------------
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Test
     void testCanInstantiate() {
-        try {
-            new PatientWait(INITIAL_DELAY, DEFAULT_TIMEOUT, PRS, PEH);
-        } catch (Throwable thrown) {
-            throw new AssertionError("Should be able to instantiate a patient wait", thrown);
-        }
+        Assertions.assertNotNull(getInstance(Duration.ZERO,
+                                             Duration.ZERO,
+                                             EXECUTION_HANDLER,
+                                             RETRY_HANDLER),
+                                 "Should be able to instantiate a PatientWait object.");
     }
 
     @Test
     void testThrowsForNullInitialDelay() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> new PatientWait(null, DEFAULT_TIMEOUT, PRS, PEH));
+                                () -> getInstance(null,
+                                                  POSITIVE_DURATION,
+                                                  EXECUTION_HANDLER,
+                                                  RETRY_HANDLER),
+                                "Should throw an exception for a null initial delay");
     }
 
     @Test
     void testThrowsForNegativeInitialDelay() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> new PatientWait(Duration.ofMinutes(-1), DEFAULT_TIMEOUT, PRS, PEH));
-    }
-
-    @Test
-    void testAllowsZeroInitialDelay() {
-        try {
-            new PatientWait(Duration.ZERO, DEFAULT_TIMEOUT, PRS, PEH);
-        } catch (Throwable thrown) {
-            throw new AssertionError("Should be able to instantiate with a zero initial delay", thrown);
-        }
+                                () -> getInstance(NEGATIVE_DURATION,
+                                                  POSITIVE_DURATION,
+                                                  EXECUTION_HANDLER,
+                                                  RETRY_HANDLER),
+                                "Should throw an exception for a negative initial delay");
     }
 
     @Test
     void testThrowsForNullDefaultTimeout() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> new PatientWait(INITIAL_DELAY, null, PRS, PEH));
+                                () -> getInstance(POSITIVE_DURATION,
+                                                  null,
+                                                  EXECUTION_HANDLER,
+                                                  RETRY_HANDLER),
+                                "Should throw an exception for a null default timeout");
     }
 
     @Test
     void testThrowsForNegativeDefaultTimeout() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> new PatientWait(INITIAL_DELAY, Duration.ofMinutes(-1), PRS, PEH));
-    }
-
-    @Test
-    void testAllowsZeroDefaultTimeout() {
-        try {
-            new PatientWait(INITIAL_DELAY, Duration.ZERO, PRS, PEH);
-        } catch (Throwable thrown) {
-            throw new AssertionError("Should be able to instantiate with a zero initial delay", thrown);
-        }
-    }
-
-    @Test
-    void testThrowsForNullRetryStrategy() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> new PatientWait(INITIAL_DELAY, DEFAULT_TIMEOUT, null, PEH));
+                                () -> getInstance(POSITIVE_DURATION,
+                                                  NEGATIVE_DURATION,
+                                                  EXECUTION_HANDLER,
+                                                  RETRY_HANDLER),
+                                "Should throw an exception for a negative default timeout");
     }
 
     @Test
     void testThrowsForNullExecutionHandler() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> new PatientWait(INITIAL_DELAY, DEFAULT_TIMEOUT, PRS, null));
+                                () -> getInstance(POSITIVE_DURATION,
+                                                  POSITIVE_DURATION,
+                                                  null,
+                                                  RETRY_HANDLER),
+                                "Should throw an exception for a null execution handler");
+    }
+
+    @Test
+    void testThrowsForNullRetryHandler() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                                () -> getInstance(POSITIVE_DURATION,
+                                                  POSITIVE_DURATION,
+                                                  EXECUTION_HANDLER,
+                                                  null),
+                                "Should throw an exception for a null retry handler");
     }
 
     @Test
     void testReturnsGivenInitialDelay() {
-        Assertions.assertTrue(INITIAL_DELAY == new PatientWait(INITIAL_DELAY, DEFAULT_TIMEOUT, PRS, PEH).getInitialDelay(),
-                              "Should return the given initial delay");
+        Duration duration = Duration.ofSeconds(1);
+        Assertions.assertEquals(duration,
+                                getInstance(duration,
+                                            POSITIVE_DURATION,
+                                            EXECUTION_HANDLER,
+                                            RETRY_HANDLER).getInitialDelay(),
+                                "Should return the given initial delay");
     }
 
     @Test
     void testReturnsGivenDefaultTimeout() {
-        Assertions.assertTrue(DEFAULT_TIMEOUT == new PatientWait(INITIAL_DELAY, DEFAULT_TIMEOUT, PRS, PEH).getDefaultTimeout(),
-                              "Should return the given default timeout");
-    }
-
-    @Test
-    void testReturnsGivenRetryStrategy() {
-        Assertions.assertTrue(PRS == new PatientWait(INITIAL_DELAY, DEFAULT_TIMEOUT, PRS, PEH).getRetryStrategy(),
-                              "Should return the given retry strategy");
+        Duration duration = Duration.ofSeconds(1);
+        Assertions.assertEquals(duration,
+                                getInstance(POSITIVE_DURATION,
+                                            duration,
+                                            EXECUTION_HANDLER,
+                                            RETRY_HANDLER).getDefaultTimeout(),
+                                "Should return the given default timeout");
     }
 
     @Test
     void testReturnsGivenExecutionHandler() {
-        Assertions.assertTrue(PEH == new PatientWait(INITIAL_DELAY, DEFAULT_TIMEOUT, PRS, PEH).getExecutionHandler(),
-                              "Should return the given execution handler");
+        Assertions.assertEquals(EXECUTION_HANDLER,
+                                getInstance(POSITIVE_DURATION,
+                                            POSITIVE_DURATION,
+                                            EXECUTION_HANDLER,
+                                            RETRY_HANDLER).getExecutionHandler(),
+                                "Should return the given execution handler");
     }
 
     @Test
-    void testCanInstantiateBuilder() {
-        Assertions.assertNotNull(PatientWait.builder(),
-                                 "Static builder method should return a Builder instance");
+    void testReturnsGivenRetryHandler() {
+        Assertions.assertEquals(RETRY_HANDLER,
+                                getInstance(POSITIVE_DURATION,
+                                            POSITIVE_DURATION,
+                                            EXECUTION_HANDLER,
+                                            RETRY_HANDLER).getRetryHandler(),
+                                "Should return the given retry handler");
     }
 
     @Test
-    void testFromReturnsNonNullInstance() {
-        Assertions.assertNotNull(new PatientWait(INITIAL_DELAY, DEFAULT_TIMEOUT, PRS, PEH).from(() -> "hello"),
-                                 "Should return a non null future with a valid callable");
+    void testFromReturnsNonNull() {
+        Assertions.assertNotNull(getInstance(POSITIVE_DURATION,
+                                             POSITIVE_DURATION,
+                                             EXECUTION_HANDLER,
+                                             RETRY_HANDLER).from(() -> true),
+                                 "Should return a non-null future with from(Executable) call.");
     }
 
     @Test
-    void testFromThrowsForNullCallable() {
+    void testFromThrowsForNullExecutable() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> new PatientWait(INITIAL_DELAY, DEFAULT_TIMEOUT, PRS, PEH).from(null));
+                                () -> getInstance(POSITIVE_DURATION,
+                                                  POSITIVE_DURATION,
+                                                  EXECUTION_HANDLER,
+                                                  RETRY_HANDLER).from(null),
+                                "Should throw for a null executable to from(Executable)");
     }
 
-    // --------------------------------------------------------------
-    // Builder test cases
-    // --------------------------------------------------------------
+    @Test
+    void testBuilderReturnsNonNull() {
+        Assertions.assertNotNull(PatientWait.builder(),
+                                 "PatientWait call to builder should return non-null Builder.");
+    }
 
-    @Nested
-    final class PatientWaitBuilderTest {
+    @Test
+    void testBuilderThrowsForNullInitialDuration() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                                () -> PatientWait.builder()
+                                                 .withInitialDelay(null),
+                                "PatientWait builder should throw for null initial delay.");
+    }
 
-        private PatientWait.Builder getInstance() {
-            return new PatientWait.Builder();
-        }
+    @Test
+    void testBuilderThrowsForNegativeInitialDuration() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                                () -> PatientWait.builder()
+                                                 .withInitialDelay(NEGATIVE_DURATION),
+                                "PatientWait builder should throw for negative initial delay.");
+    }
 
-        @Test
-        void testCanInstantiate() {
-            Assertions.assertNotNull(getInstance(),
-                                     "Should be able to instantiate the patient wait builder");
-        }
+    @Test
+    void testBuilderThrowsForNullDefaultTimeout() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                                () -> PatientWait.builder()
+                                                 .withDefaultTimeout(null),
+                                "PatientWait builder should throw for null default timeout.");
+    }
 
-        @Test
-        void testBuilderThrowsExceptionForNullInitialDelay() {
-            Assertions.assertThrows(IllegalArgumentException.class,
-                                    () -> getInstance().withInitialDelay(null));
-        }
+    @Test
+    void testBuilderThrowsForNegativeDefaultTimeout() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                                () -> PatientWait.builder()
+                                                 .withDefaultTimeout(NEGATIVE_DURATION),
+                                "PatientWait builder should throw for negative default timeout.");
+    }
 
-        @Test
-        void testBuilderThrowsExceptionForNegativeInitialDelay() {
-            Assertions.assertThrows(IllegalArgumentException.class,
-                                    () -> getInstance().withInitialDelay(Duration.ofDays(-1)));
-        }
+    @Test
+    void testBuilderThrowsForExecutionHandler() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                                () -> PatientWait.builder()
+                                                 .withExecutionHandler(null),
+                                "PatientWait builder should throw for null execution handler.");
+    }
 
-        @Test
-        void testBuilderAllowsZeroForInitialDelay() {
-            getInstance().withInitialDelay(Duration.ZERO);
-        }
+    @Test
+    void testBuilderThrowsForRetryHandler() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                                () -> PatientWait.builder()
+                                                 .withRetryHandler(null),
+                                "PatientWait builder should throw for null retry handler.");
+    }
 
-        @Test
-        void testBuilderThrowsExceptionForNullDefaultTimeout() {
-            Assertions.assertThrows(IllegalArgumentException.class,
-                                    () -> getInstance().withDefaultTimeout(null));
-        }
+    @Test
+    void testBuilderBuildReturnsNonNull() {
+        Assertions.assertNotNull(PatientWait.builder().build(),
+                                 "PatientWait builder call to build should return non-null PatientWait.");
+    }
 
-        @Test
-        void testBuilderThrowsExceptionForNegativeDefaultTimeout() {
-            Assertions.assertThrows(IllegalArgumentException.class,
-                                    () -> getInstance().withDefaultTimeout(Duration.ofDays(-1)));
-        }
+    @Test
+    void testBuilderBuildReturnsWaitWithGivenInitialDuration() {
+        Duration duration = Duration.ofSeconds(1);
+        Assertions.assertEquals(duration,
+                                PatientWait.builder()
+                                           .withInitialDelay(duration)
+                                           .build()
+                                           .getInitialDelay(),
+                                "Builder built PatientWait should return the given initial delay after building");
+    }
 
-        @Test
-        void testBuilderAllowsZeroForDefaultTimeout() {
-            getInstance().withDefaultTimeout(Duration.ZERO);
-        }
+    @Test
+    void testBuilderBuildReturnsWaitWithGivenDefaultTimeout() {
+        Duration duration = Duration.ofSeconds(1);
+        Assertions.assertEquals(duration,
+                                PatientWait.builder()
+                                           .withDefaultTimeout(duration)
+                                           .build()
+                                           .getDefaultTimeout(),
+                                "Builder built PatientWait should return the given default timeout after building");
+    }
 
-        @Test
-        void testBuilderThrowsExceptionForNullRetryStrategy() {
-            Assertions.assertThrows(IllegalArgumentException.class,
-                                    () -> getInstance().withRetryStrategy(null));
-        }
+    @Test
+    void testBuilderBuildReturnsWaitWithGivenExecutionHandler() {
+        Assertions.assertEquals(EXECUTION_HANDLER,
+                                PatientWait.builder()
+                                           .withExecutionHandler(EXECUTION_HANDLER)
+                                           .build()
+                                           .getExecutionHandler(),
+                                "Builder built PatientWait should return the given execution handler after building");
+    }
 
-        @Test
-        void testBuilderThrowsExceptionForNullExecutionHandler() {
-            Assertions.assertThrows(IllegalArgumentException.class,
-                                    () -> getInstance().withExecutionHandler(null));
-        }
+    @Test
+    void testBuilderBuildReturnsWaitWithGivenRetryHandler() {
+        Assertions.assertEquals(RETRY_HANDLER,
+                                PatientWait.builder()
+                                           .withRetryHandler(RETRY_HANDLER)
+                                           .build()
+                                           .getRetryHandler(),
+                                "Builder built PatientWait should return the given retry handler after building");
+    }
 
-        @Test
-        void testBuilderStartsWithExpectedDefaultInitialDelay() {
-            PatientWait wait = new PatientWait.Builder().build();
-            Assertions.assertEquals(Duration.ZERO,
-                                    wait.getInitialDelay(),
-                                    "Builder should have given the wait the default initial delay");
-            Assertions.assertEquals(Duration.ZERO,
-                                    wait.getDefaultTimeout(),
-                                    "Builder should have given the wait the default default timeout");
-            Assertions.assertTrue(wait.getRetryStrategy() instanceof FixedDelayPatientRetryStrategy,
-                                  "Builder should have given the wait the default retry strategy");
-            Assertions.assertTrue(wait.getExecutionHandler() instanceof SimplePatientExecutionHandler,
-                                  "Builder should have given the wait the default execution handler");
-        }
-
-        @Test
-        void testBuilderTransfersGivenValuesToPatientWait() {
-            PatientWait wait = new PatientWait.Builder().withInitialDelay(INITIAL_DELAY)
-                                                        .withDefaultTimeout(DEFAULT_TIMEOUT)
-                                                        .withRetryStrategy(PRS)
-                                                        .withExecutionHandler(PEH)
-                                                        .build();
-            Assertions.assertEquals(INITIAL_DELAY,
-                                    wait.getInitialDelay(),
-                                    "Builder should have given the wait the expected initial delay");
-            Assertions.assertEquals(DEFAULT_TIMEOUT,
-                                    wait.getDefaultTimeout(),
-                                    "Builder should have given the wait the expected default timeout");
-            Assertions.assertEquals(PRS,
-                                    wait.getRetryStrategy(),
-                                    "Builder should have given the wait the expected retry strategy");
-            Assertions.assertEquals(PEH,
-                                    wait.getExecutionHandler(),
-                                    "Builder should have given the wait the expected execution handler");
-        }
+    @Test
+    void testBuilderCreatesPatientWaitWithExpectedDefaults() {
+        PatientWait wait = PatientWait.builder().build();
+        Assertions.assertAll(() -> Assertions.assertEquals(Duration.ZERO, wait.getInitialDelay()),
+                             () -> Assertions.assertEquals(Duration.ZERO, wait.getDefaultTimeout()),
+                             () -> Assertions.assertTrue(wait.getExecutionHandler() instanceof SimpleExecutionHandler),
+                             () -> Assertions.assertTrue(wait.getRetryHandler() instanceof FixedDelayPatientRetryHandler));
     }
 }

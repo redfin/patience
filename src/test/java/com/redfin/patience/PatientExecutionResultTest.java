@@ -19,86 +19,91 @@ package com.redfin.patience;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.NoSuchElementException;
-
-@SuppressWarnings("ResultOfMethodCallIgnored")
 final class PatientExecutionResultTest {
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Test constants & helpers
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    private static final String VALUE = "hello";
-
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Test cases
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Test
-    void testCanCreateFailureResult() {
-        Assertions.assertNotNull(PatientExecutionResult.failure(VALUE),
-                                 "Should be able to create a failure result");
-    }
-
-    @Test
-    void testFailureResultThrowsForNullDescription() {
+    void testFailingResultThrowsForNullDescription() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> PatientExecutionResult.failure(null));
+                                () -> PatientExecutionResult.fail(null),
+                                "Should throw an exception for a null failure description");
     }
 
     @Test
-    void testCanCreateSuccessResultWithNull() {
-        Assertions.assertNotNull(PatientExecutionResult.success(null),
-                                 "Should be able to create a success result with null");
+    void testFailingResultThrowsForEmptyDescription() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                                () -> PatientExecutionResult.fail(""),
+                                "Should throw an exception for an empty failure description");
     }
 
     @Test
-    void testCanCreateSuccessResultWithNonNull() {
-        Assertions.assertNotNull(PatientExecutionResult.success(VALUE),
-                                 "Should be able to create a success result");
+    void testFailingResultReturnsNonNullForValidDescription() {
+        Assertions.assertNotNull(PatientExecutionResult.fail("failure"),
+                                 "Should get a non-null execution result for a valid description");
     }
 
     @Test
-    void testFailureResultGetSuccessResultThrowsException() {
-        Assertions.assertThrows(NoSuchElementException.class,
-                                () -> PatientExecutionResult.failure(VALUE).getSuccessResult());
+    void testFailingResultReturnsFalseForIsSuccess() {
+        Assertions.assertFalse(PatientExecutionResult.fail("failure")
+                                                     .isSuccess(),
+                               "A failing execution result should return false for isSuccess()");
     }
 
     @Test
-    void testFailureResultWasSuccessfulReturnsFalse() {
-        Assertions.assertFalse(PatientExecutionResult.failure(VALUE).wasSuccessful(),
-                               "A failure PatientExecutionResult should return false for wasSuccessful");
+    void testPassingResultReturnsTrueForIsSuccess_TrueResult() {
+        Assertions.assertTrue(PatientExecutionResult.pass(true)
+                                                    .isSuccess(),
+                              "A passing execution result should return true for isSuccess()");
     }
 
     @Test
-    void testFailureResultGetFailureDescriptionReturnsGivenDescription() {
-        Assertions.assertEquals(VALUE,
-                                PatientExecutionResult.failure(VALUE).getFailureDescription(),
-                                "A failure PatientExecutionResult should return the given failure description");
+    void testPassingResultReturnsTrueForIsSuccess_FalseResult() {
+        Assertions.assertTrue(PatientExecutionResult.pass(false)
+                                                    .isSuccess(),
+                              "A passing execution result should return true for isSuccess()");
     }
 
     @Test
-    void testSuccessResultGetReturnsGivenValue() {
-        Assertions.assertEquals(VALUE,
-                                PatientExecutionResult.success(VALUE).getSuccessResult(),
-                                "A PatientExecutionResult with a value should return the given value");
+    void testPassingResultReturnsTrueForIsSuccess_NonBooleanResult() {
+        Assertions.assertTrue(PatientExecutionResult.pass("hello")
+                                                    .isSuccess(),
+                              "A passing execution result should return true for isSuccess()");
     }
 
     @Test
-    void testSuccessResultGetReturnsGivenValueForNull() {
-        Assertions.assertNull(PatientExecutionResult.success(null).getSuccessResult(),
-                              "A PatientExecutionResult with a value of null should return null for get");
+    void testPassingResultReturnsGivenResult() {
+        String value = "hello";
+        Assertions.assertEquals(value,
+                                PatientExecutionResult.pass(value)
+                                                      .getResult(),
+                                "A passing execution result should return the given result");
     }
 
     @Test
-    void testSuccessResultWasSuccessfulReturnsTrue() {
-        Assertions.assertTrue(PatientExecutionResult.success(VALUE).wasSuccessful(),
-                              "A non-empty PatientExecutionResult should return true for wasSuccessful");
+    void testPassingResultThrowsForGetFailureDescription() {
+        Assertions.assertThrows(UnsupportedOperationException.class,
+                                () -> PatientExecutionResult.pass("hello")
+                                                            .getFailedAttemptDescription(),
+                                "A passing execution result should throw for getFailedAttemptDescription()");
     }
 
     @Test
-    void testSuccessResultGetFailureDescriptionThrows() {
-        Assertions.assertThrows(NoSuchElementException.class,
-                                () -> PatientExecutionResult.success(VALUE).getFailureDescription());
+    void testFailingResultThrowsForGivenResult() {
+        Assertions.assertThrows(UnsupportedOperationException.class,
+                                () -> PatientExecutionResult.fail("hello")
+                                                            .getResult(),
+                                "A failing execution result should throw for getResult()");
+    }
+
+    @Test
+    void testFailingResultReturnsGivenFailureDescription() {
+        String message = "hello";
+        Assertions.assertEquals(message,
+                                PatientExecutionResult.fail(message)
+                                                      .getFailedAttemptDescription(),
+                                "A failing execution result should return given failure description");
     }
 }

@@ -16,72 +16,69 @@
 
 package com.redfin.patience;
 
-import com.redfin.patience.executionhandlers.IgnoringAllPatientExecutionHandler;
-import com.redfin.patience.executionhandlers.IgnoringPatientExecutionHandler;
-import com.redfin.patience.executionhandlers.SimplePatientExecutionHandler;
+import com.redfin.patience.executions.IgnoringExecutionHandler;
+import com.redfin.patience.executions.SimpleExecutionHandler;
 
-import java.util.concurrent.Callable;
-import java.util.function.Predicate;
-
-import static com.redfin.validity.Validity.validate;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
- * A non-instantiable class that wraps creation
- * of the {@link PatientExecutionHandler} implementations in
- * the Patience library.
+ * A static, non-instantiable, class for obtaining instances of different
+ * implementations of the {@link PatientExecutionHandler} interface.
  */
 public final class PatientExecutionHandlers {
 
-    /*
-     * Some execution handler don't contain any state
-     * so they may be re-used safely.
-     */
-
-    private static final SimplePatientExecutionHandler SIMPLE = new SimplePatientExecutionHandler();
-    private static final IgnoringAllPatientExecutionHandler IGNORING_ALL = new IgnoringAllPatientExecutionHandler();
-
-    /**
-     * @return a new {@link SimplePatientExecutionHandler} instance.
-     */
-    public static SimplePatientExecutionHandler simpleHandler() {
-        return SIMPLE;
-    }
-
-    /**
-     * All exceptions thrown during the execution of the
-     * {@link PatientExecutionHandler#execute(Callable, Predicate)} will
-     * be checked with the given exception types so it is a best practice to ignore
-     * with as much granularity as possible so that unexpected exceptions are not
-     * ignored.
-     *
-     * @param exceptionType  an exception type to be ignored.
-     * @param exceptionTypes additional exception types to be ignored.
-     *
-     * @return a new {@link IgnoringPatientExecutionHandler} instance with the given types
-     * to be ignored.
-     *
-     * @throws IllegalArgumentException if exceptionType is null.
-     */
-    @SafeVarargs
-    public static IgnoringPatientExecutionHandler ignoring(Class<? extends Exception> exceptionType,
-                                                           Class<? extends Exception>... exceptionTypes) {
-        validate().that(exceptionType).isNotNull();
-        return new IgnoringPatientExecutionHandler(exceptionType,
-                                                   exceptionTypes);
-    }
-
-    /**
-     * @return a new {@link IgnoringAllPatientExecutionHandler} instance.
-     */
-    public static IgnoringAllPatientExecutionHandler ignoringAll() {
-        return IGNORING_ALL;
-    }
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Instance Methods
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     /*
-     * Ensure this class is non-instantiable.
+     * Make sure that the static class cannot be instantiated
      */
 
     private PatientExecutionHandlers() {
-        throw new AssertionError("Cannot instantiate this class");
+        throw new AssertionError("Cannot instantiate PatientExecutionHandlers.");
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Static Methods
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    /**
+     * @return a new {@link SimpleExecutionHandler} instance.
+     */
+    public static PatientExecutionHandler simple() {
+        return new SimpleExecutionHandler();
+    }
+
+    /**
+     * @param ignoredThrowableTypes the collection of class throwable classes that should be ignored.
+     *                              A null or empty array will return an execution handler that
+     *                              doesn't ignore any throwable that is thrown.
+     *
+     * @return a new {@link IgnoringExecutionHandler} instance that ignores the given types.
+     */
+    @SafeVarargs
+    public static PatientExecutionHandler ignoring(Class<? extends Throwable>... ignoredThrowableTypes) {
+        return ignoring(null == ignoredThrowableTypes ? null : Arrays.asList(ignoredThrowableTypes));
+    }
+
+    /**
+     * @param ignoredThrowableTypes the collection of class throwable classes that should be ignored.
+     *                              A null or empty collection will return an execution handler that
+     *                              doesn't ignore any throwable that is thrown.
+     *
+     * @return a new {@link IgnoringExecutionHandler} instance that ignores the given types.
+     */
+    public static PatientExecutionHandler ignoring(Collection<Class<? extends Throwable>> ignoredThrowableTypes) {
+        return new IgnoringExecutionHandler(ignoredThrowableTypes);
+    }
+
+    /**
+     * @return a new {@link IgnoringExecutionHandler} instance that ignores all
+     * Throwable types.
+     */
+    public static PatientExecutionHandler ignoringAll() {
+        return ignoring(Throwable.class);
     }
 }

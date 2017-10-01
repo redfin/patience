@@ -17,55 +17,56 @@
 package com.redfin.patience;
 
 /**
- * A PatientInterruptedException is an unchecked exception. It is intended
- * to signal that an {@link InterruptedException} was thrown while manually
- * blocking a thread for the Patient library without being a checked exception.
+ * A PatientException is an unchecked exception. It is intended
+ * to signal that an unexpected Throwable was caught while executing
+ * the supplied {@link Executable} or filtering the results with
+ * the supplied {@link java.util.function.Predicate}.
  */
-public final class PatientInterruptedException
+public final class PatientExecutionException
            extends RuntimeException {
 
     static final long serialVersionUID = 3L;
 
     /**
-     * Constructs a new patience exception with {@code null} as its
+     * Constructs a new patience execution exception with {@code null} as its
      * detail message and cause.
      */
-    public PatientInterruptedException() {
+    public PatientExecutionException() {
         super();
     }
 
     /**
-     * Constructs a new patience exception with the specified detail message.
+     * Constructs a new patience execution exception with the specified detail message.
      * The cause will be {@code null}.
      *
      * @param message the detail message. If {@code null} then it is the same
-     *                as calling {@link #PatientInterruptedException()}.
+     *                as calling {@link #PatientExecutionException()}.
      */
-    public PatientInterruptedException(String message) {
+    public PatientExecutionException(String message) {
         super(message);
     }
 
     /**
-     * Constructs a new patience exception with the specified detail message and
+     * Constructs a new patience execution exception with the specified detail message and
      * cause.
      *
      * @param message the detail message. If {@code null} then it is the same
-     *                as calling {@link #PatientInterruptedException(Throwable)}.
+     *                as calling {@link #PatientExecutionException(Throwable)}.
      * @param cause   the cause of the exception. If {@code null} then it is the
-     *                same as calling {@link #PatientInterruptedException(String)}.
+     *                same as calling {@link #PatientExecutionException(String)}.
      */
-    public PatientInterruptedException(String message, Throwable cause) {
+    public PatientExecutionException(String message, Throwable cause) {
         super(message, cause);
     }
 
     /**
-     * Constructs a new patience exception with the specified cause.
+     * Constructs a new patience execution exception with the specified cause.
      * The message will be {@code null}.
      *
      * @param cause the cause of the exception. If {@code null} then it is the
-     *              same as calling {@link #PatientInterruptedException()}.
+     *              same as calling {@link #PatientExecutionException()}.
      */
-    public PatientInterruptedException(Throwable cause) {
+    public PatientExecutionException(Throwable cause) {
         super(cause);
     }
 }

@@ -26,9 +26,10 @@ import static com.redfin.validity.Validity.validate;
  * A PatientTimeoutException is an unchecked exception. It is intended to signal that
  * a timeout was reached without receiving a valid value.
  */
-public class PatientTimeoutException extends RuntimeException {
+public final class PatientTimeoutException
+           extends RuntimeException {
 
-    static final long serialVersionUID = 1L;
+    static final long serialVersionUID = 3L;
 
     private final List<String> attemptDescriptions;
 
@@ -41,13 +42,14 @@ public class PatientTimeoutException extends RuntimeException {
      *                            May be null.
      * @param attemptDescriptions the list of String descriptions of the invalid
      *                            results when waiting.
-     *                            May not be null.
+     *                            May not be null or empty.
      *
      * @throws IllegalArgumentException if attemptDescriptions is null.
      */
-    public PatientTimeoutException(String message, List<String> attemptDescriptions) {
+    public PatientTimeoutException(String message,
+                                   List<String> attemptDescriptions) {
         super(message);
-        validate().that(attemptDescriptions).isNotNull();
+        validate().that(attemptDescriptions).isNotEmpty();
         // Make a copy of the list and make it unmodifiable
         List<String> newList = new ArrayList<>(attemptDescriptions.size());
         newList.addAll(attemptDescriptions);

@@ -16,88 +16,94 @@
 
 package com.redfin.patience;
 
-import java.util.NoSuchElementException;
-
-import static com.redfin.validity.Validity.validate;
+import static com.redfin.validity.Validity.*;
 
 /**
- * An immutable container for results of running a Patient execution attempt.
- * It is similar to an {@link java.util.Optional} except that a null value
- * can be considered a valid, non-empty result.
+ * A PatientExecutionResult is an immutable object that signifies the outcome of a single
+ * execution attempt while patiently waiting and is returned by a {@link PatientExecutionHandler}.
+ * It will have either the successful result or a String description
+ * of the failed attempt.
  *
- * @param <T> the type of result this holds.
+ * @param <T> the type of the result.
  */
 public final class PatientExecutionResult<T> {
 
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Instance Fields & Methods
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     private final T result;
-    private final String failureDescription;
+    private final String failedAttemptDescription;
 
-    private PatientExecutionResult(T result, String failureDescription) {
+    private PatientExecutionResult(T result,
+                                   String failedAttemptDescription) {
+        validate().withMessage("Cannot have a PatientResult with a non-null result and a non-null failed attempt description")
+                  .that(null != result && null != failedAttemptDescription)
+                  .isFalse();
         this.result = result;
-        this.failureDescription = failureDescription;
+        this.failedAttemptDescription = failedAttemptDescription;
     }
 
     /**
-     * If this is not a valid result this will throw an exception. You
-     * should call {@link #wasSuccessful()} before calling this.
-     *
-     * @return the value contained in this result.
-     * This may be null.
-     *
-     * @throws NoSuchElementException if this is a failure result.
+     * @return true if this is a successful result or false if it is not.
      */
-    public T getSuccessResult() {
-        if (null != failureDescription) {
-            throw new NoSuchElementException("Cannot get a success value from a failed result");
+    public boolean isSuccess() {
+        return null == failedAttemptDescription;
+    }
+
+    /**
+     * @return the result value if {@link #isSuccess()} returns true. This may
+     * be null.
+     *
+     * @throws UnsupportedOperationException if {@link #isSuccess()} returns false.
+     */
+    public T getResult() {
+        if (isSuccess()) {
+            return result;
+        } else {
+            throw new UnsupportedOperationException("Cannot get the result from an unsuccessful PatientExecutionResult.");
         }
-        return result;
     }
 
     /**
-     * If this is a valid result this will throw an exception. You
-     * should call {@link #wasSuccessful()} before calling this.
+     * @return the String description of the failed execution attempt if {@link #isSuccess()} returns false.
      *
-     * @return the String description of the invalid result or swallowed
-     * exception.
-     *
-     * @throws NoSuchElementException if this is a successful result.
+     * @throws UnsupportedOperationException if {@link #isSuccess()} returns true.
      */
-    public String getFailureDescription() {
-        if (null == failureDescription) {
-            throw new NoSuchElementException("Cannot get a failure description from a success result");
+    public String getFailedAttemptDescription() {
+        if (isSuccess()) {
+            throw new UnsupportedOperationException("Cannot get the failed attempt description from a successful PatientExecutionResult.");
+        } else {
+            return failedAttemptDescription;
         }
-        return failureDescription;
     }
 
-    /**
-     * @return true if this was a success result.
-     */
-    public boolean wasSuccessful() {
-        return null == failureDescription;
-    }
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Static Methods
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     /**
-     * @param description the String description of the invalid result or swallowed exception.
-     *                    May not be null.
-     * @param <T>         the type of the returned result instance.
+     * @param result the result that is wrapped by this object.
+     * @param <T>    the type of the result.
      *
-     * @return a new, unsuccessful {@link PatientExecutionResult} instance.
-     *
-     * @throws IllegalArgumentException if description is null.
+     * @return a new {@link PatientExecutionResult} instance that is successful and
+     * has the given result.
      */
-    public static <T> PatientExecutionResult<T> failure(String description) {
-        validate().that(description).isNotNull();
-        return new PatientExecutionResult<>(null, description);
-    }
-
-    /**
-     * @param result the value to store in this successful result instance.
-     *               May be null.
-     * @param <T>    the type of the returned result instance.
-     *
-     * @return a new, successful {@link PatientExecutionResult} instance with the given value.
-     */
-    public static <T> PatientExecutionResult<T> success(T result) {
+    public static <T> PatientExecutionResult<T> pass(T result) {
         return new PatientExecutionResult<>(result, null);
+    }
+
+    /**
+     * @param failedAttemptDescription the String description of the failed attempt.
+     * @param <T>                      the type of the result.
+     *
+     * @return a new {@link PatientExecutionResult} instance that is not successful and
+     * has the given failure description.
+     *
+     * @throws IllegalArgumentException if failedAttemptDescription is null or empty.
+     */
+    public static <T> PatientExecutionResult<T> fail(String failedAttemptDescription) {
+        validate().that(failedAttemptDescription).isNotEmpty();
+        return new PatientExecutionResult<>(null, failedAttemptDescription);
     }
 }

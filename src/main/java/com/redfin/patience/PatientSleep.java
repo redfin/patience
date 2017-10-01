@@ -63,6 +63,6 @@ public final class PatientSleep {
      */
 
     private PatientSleep() {
-        throw new AssertionError("Cannot instantiate this class");
+        throw new AssertionError("Cannot instantiate the PatientSleep class");
     }
 }

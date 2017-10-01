@@ -17,51 +17,193 @@
 package com.redfin.patience;
 
 import java.time.Duration;
+import java.util.function.Predicate;
+
+import static com.redfin.validity.Validity.*;
 
 /**
- * This interface defines the extraction of a value from
- * the Patient library. These methods are intended to be the
- * terminal calls of any wait.
+ * A PatientFuture is an immutable object that holds all of the information needed
+ * to wait patiently for a valid result from the given executable.
  *
- * @param <T> the type of object returned from the given callable.
+ * @param <T> the type to be returned from this future instance.
  */
-public interface PatientFuture<T> {
+public final class PatientFuture<T> {
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Instance Fields & Methods
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    private final Duration initialDelay;
+    private final Duration defaultTimeout;
+    private final PatientRetryHandler retryHandler;
+    private final PatientExecutionHandler executionHandler;
+    private final Executable<T> executable;
+    private final Predicate<T> filter;
+    private final String failureMessage;
 
     /**
-     * Attempt to retrieve a valid result from the future instance. If a
-     * valid result is found within the default timeout form the {@link PatientWait} object,
-     * then return it. If not, then a {@link PatientTimeoutException} will be thrown.
+     * Create a new {@link PatientFuture} instance with the given values.
      *
-     * @return the first value from the set callable that passes the given predicate test.
+     * @param initialDelay     the {@link Duration} time to sleep when waiting for a value.
+     *                         A value of zero means to not sleep.
+     *                         May not be null or negative.
+     * @param defaultTimeout   the {@link Duration} default maximum wait time. This is used
+     *                         for the {@link #get()} method.
+     *                         A value of zero means to attempt to get a value only once.
+     *                         May not be null or negative.
+     * @param retryHandler     the {@link PatientRetryHandler} to be used for this future.
+     *                         May not be null.
+     * @param executionHandler the {@link PatientExecutionHandler} to be used for this future.
+     *                         May not be null.
+     * @param executable       the {@link Executable} to be used to retrieve values.
+     *                         May not be null.
+     * @param filter           the {@link Predicate} to be used to test values from the executable.
+     *                         May not be null.
+     * @param failureMessage   the String message for the {@link PatientTimeoutException} if no
+     *                         valid value is found within the timeout. May not be null or negative.
      *
-     * @throws ArithmeticException     if an overflow occurs when converting the timeout duration
-     *                                 to milliseconds and nanoseconds for the sleepFor duration.
-     * @throws PatientTimeoutException if no valid result is found within the given timeout.
-     * @throws PatientException        if an illegal internal state occurs during the retry attempts
-     *                                 or a thread {@link InterruptedException} is thrown while sleeping.
-     * @throws RuntimeException        if an unhandled error occurs during execution by the
-     *                                 {@link PatientExecutionHandler}.
+     * @throws IllegalArgumentException if any argument is null, if failureMessage is empty, or if
+     *                                  either initialDelay or defaultTimeout are negative.
      */
-    T get();
+    public PatientFuture(Duration initialDelay,
+                         Duration defaultTimeout,
+                         PatientRetryHandler retryHandler,
+                         PatientExecutionHandler executionHandler,
+                         Executable<T> executable,
+                         Predicate<T> filter,
+                         String failureMessage) {
+        this.initialDelay = validate().that(initialDelay).isAtLeast(Duration.ZERO);
+        this.defaultTimeout = validate().that(defaultTimeout).isAtLeast(Duration.ZERO);
+        this.retryHandler = validate().that(retryHandler).isNotNull();
+        this.executionHandler = validate().that(executionHandler).isNotNull();
+        this.executable = validate().that(executable).isNotNull();
+        this.filter = validate().that(filter).isNotNull();
+        this.failureMessage = validate().that(failureMessage).isNotEmpty();
+    }
 
     /**
-     * Attempt to retrieve a valid result from the future instance. If a
-     * valid result is found within the given timeout form the {@link PatientWait} object,
-     * then return it. If not, then a {@link PatientTimeoutException} will be thrown.
+     * @param failureMessage the String message to be given to the {@link PatientTimeoutException}
+     *                       if no valid result is found within the timeout.
+     *                       May not be null or empty.
      *
-     * @param timeout the link {@link Duration} timeout to use.
-     *                May not be null.
-     *                A duration of zero simply means make one attempt and then stop.
+     * @return a new {@link PatientFuture} instance with the current values and the given message.
      *
-     * @return the first value from the set callable that passes the given predicate test.
-     *
-     * @throws ArithmeticException     if an overflow occurs when converting the timeout duration
-     *                                 to milliseconds and nanoseconds for the sleepFor duration.
-     * @throws PatientTimeoutException if no valid result is found within the given timeout.
-     * @throws PatientException        if an illegal internal state occurs during the retry attempts
-     *                                 or a thread {@link InterruptedException} is thrown while sleeping.
-     * @throws RuntimeException        if an unhandled error occurs during execution by the
-     *                                 {@link PatientExecutionHandler}.
+     * @throws IllegalArgumentException if failureMessage is null or empty.
      */
-    T get(Duration timeout);
+    public PatientFuture<T> withMessage(String failureMessage) {
+        validate().that(failureMessage).isNotEmpty();
+        return new PatientFuture<>(initialDelay,
+                                   defaultTimeout,
+                                   retryHandler,
+                                   executionHandler,
+                                   executable,
+                                   filter,
+                                   failureMessage);
+    }
+
+    /**
+     * @param filter the {@link Predicate} to use to verify if a value from the given
+     *               {@link Executable} is a valid result.
+     *               May not be null.
+     *
+     * @return a new {@link PatientFuture} instance with the current values and the given filter.
+     *
+     * @throws IllegalArgumentException if filter is null.
+     */
+    public PatientFuture<T> withFilter(Predicate<T> filter) {
+        validate().that(filter).isNotNull();
+        return new PatientFuture<>(initialDelay,
+                                   defaultTimeout,
+                                   retryHandler,
+                                   executionHandler,
+                                   executable,
+                                   filter,
+                                   failureMessage);
+    }
+
+    /**
+     * This is the same as calling {@link #get(Duration)} with the default timeout
+     * duration for this patient future.
+     *
+     * @return the first found valid result from this patient future instance.
+     *
+     * @throws PatientTimeoutException if no valid result is found within the
+     *                                 given default timeout.
+     */
+    public T get() {
+        return get(defaultTimeout);
+    }
+
+    /**
+     * Begin executing the patient wait in the following way:
+     * <ul>
+     * <li>Sleep for the initial delay, if any.</li>
+     * <li>Use the given retry handler and execution handler to begin execution.</li>
+     * <li>If a successful {@link PatientResult} is returned from the retry handler, then return the result value.</li>
+     * <li>If the {@link PatientResult} is not successful, throw a {@link PatientTimeoutException}.</li>
+     * </ul>
+     *
+     * @param timeout the {@link Duration} that represents the maximum amount
+     *                of time to try to find a valid result. Note that a failure
+     *                can occur before the timeout is reached depending upon the
+     *                {@link PatientRetryHandler}.
+     *                A value of zero means only attempt to get a value once.
+     *                May not be null or negative.
+     *
+     * @return the first found valid result from this patient future instance.
+     *
+     * @throws IllegalArgumentException if timeout is null or negative.
+     * @throws PatientTimeoutException  if no valid result is found within the
+     *                                  given timeout.
+     */
+    public T get(Duration timeout) {
+        validate().that(timeout).isAtLeast(Duration.ZERO);
+        // Sleep for the initial timeout (if any)
+        PatientSleep.sleepFor(initialDelay);
+        // Start waiting for a result
+        PatientResult<T> result = retryHandler.execute(() -> executionHandler.execute(executable, filter),
+                                                       timeout);
+        // Validate the result
+        if (null == result) {
+            throw new PatientException("Received a null PatientResult from the wait function.");
+        }
+        // Return the value or throw
+        if (result.isSuccess()) {
+            return result.getResult();
+        } else {
+            throw new PatientTimeoutException(failureMessage, result.getFailedAttemptDescriptions());
+        }
+    }
+
+    // ----------------------------------------------------
+    // Package-private methods for testing
+    // ----------------------------------------------------
+
+    Duration getInitialDelay() {
+        return initialDelay;
+    }
+
+    Duration getDefaultTimeout() {
+        return defaultTimeout;
+    }
+
+    PatientRetryHandler getRetryHandler() {
+        return retryHandler;
+    }
+
+    PatientExecutionHandler getExecutionHandler() {
+        return executionHandler;
+    }
+
+    Executable<T> getExecutable() {
+        return executable;
+    }
+
+    Predicate<T> getFilter() {
+        return filter;
+    }
+
+    String getFailureMessage() {
+        return failureMessage;
+    }
 }

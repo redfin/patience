@@ -14,33 +14,17 @@
  * limitations under the License.
  */
 
-package com.redfin.patience;
+package com.redfin.patience.executions;
 
-final class PatientExceptionTest
- implements ExceptionContract<PatientException> {
+final class SimpleExecutionHandlerTest
+ implements PatientExecutionHandlerContract<SimpleExecutionHandler> {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Test constants, requirements, and helpers
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Override
-    public PatientException getInstance() {
-        return new PatientException();
-    }
-
-    @Override
-    public PatientException getInstance(String message) {
-        return new PatientException(message);
-    }
-
-    @Override
-    public PatientException getInstance(Throwable cause) {
-        return new PatientException(cause);
-    }
-
-    @Override
-    public PatientException getInstance(String message,
-                                        Throwable cause) {
-        return new PatientException(message, cause);
+    public SimpleExecutionHandler getInstance() {
+        return new SimpleExecutionHandler();
     }
 }

@@ -18,14 +18,16 @@ package com.redfin.patience;
 
 /**
  * A PatientException is an unchecked exception. It is intended
- * to signal that an unexpected, illegal state has occurred during
- * the waiting for a condition. This does not indicate a timeout (see
- * {@link PatientException}) or a thread interruption while sleeping
+ * to signal that a problem has occurred within the Patient library itself.
+ * This does not indicate a timeout (see {@link PatientException}), an issue
+ * thrown by executing the supplied {@link Executable} or filtering {@link java.util.function.Predicate}
+ * (see {@link PatientExecutionException}, or a thread interruption while sleeping
  * (see {@link PatientInterruptedException}).
  */
-public class PatientException extends RuntimeException {
+public final class PatientException
+           extends RuntimeException {
 
-    static final long serialVersionUID = 0L;
+    static final long serialVersionUID = 3L;
 
     /**
      * Constructs a new patience exception with {@code null} as its
@@ -68,26 +70,5 @@ public class PatientException extends RuntimeException {
      */
     public PatientException(Throwable cause) {
         super(cause);
-    }
-
-    /**
-     * Constructs a new patience exception with the specified detail
-     * message, cause, suppression enabled or disabled, and writable
-     * stack trace enabled or disabled.
-     *
-     * @param message            the detail message. If {@code null} then it is the
-     *                           same as having been not set.
-     * @param cause              the cause of the exception. If {@code null} then it is the
-     *                           same as having been not set.
-     * @param enableSuppression  whether or not suppression is enabled
-     *                           or disabled.
-     * @param writableStackTrace whether or not the stack trace should
-     *                           be writable.
-     */
-    protected PatientException(String message,
-                               Throwable cause,
-                               boolean enableSuppression,
-                               boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

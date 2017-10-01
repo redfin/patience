@@ -14,42 +14,46 @@
  * limitations under the License.
  */
 
-package com.redfin.patience.retrystrategies;
+package com.redfin.patience.retries;
 
 import java.time.Duration;
 import java.util.function.Supplier;
 
-import static com.redfin.validity.Validity.validate;
+import static com.redfin.validity.Validity.*;
 
 /**
- * A concrete implementation of the {@link AbstractDelayPatientRetryStrategy} that calculates
- * an exponential back off based on the given initial duration and base so that each attempt
- * will result in a longer wait until the next attempt.
+ * An implementation of {@link com.redfin.patience.PatientRetryHandler} that
+ * has an increasing duration to wait between each execution attempt. The duration
+ * increase is exponential.
  */
-public class ExponentialDelayPatientRetryStrategy extends AbstractDelayPatientRetryStrategy {
+public final class ExponentialDelayPatientRetryHandler
+           extends AbstractPatientRetryHandler {
 
     private final int base;
     private final Duration initialDelay;
 
     /**
-     * Create a new {@link ExponentialDelayPatientRetryStrategy} with the given
-     * base and initial duration.
+     * Create a new {@link ExponentialDelayPatientRetryHandler} instance with the
+     * given base and initial delay. If the base is set to one that is the same as
+     * using a fixed delay retry handler with the given initial delay.
      *
-     * @param base         the base for the exponential calculation.
-     *                     Must be greater than zero.
-     * @param initialDelay the initial {@link Duration} between executions.
-     *                     May not be null, zero, or negative.
+     * @param base         the int base of the power function.
+     *                     Must be greater than 0.
+     * @param initialDelay the {@link Duration} initial delay duration.
+     *                     May not be null, negative, or zero.
      *
-     * @throws IllegalArgumentException if initialDuration is null or either are less than
+     * @throws IllegalArgumentException if delayDuration is null or negative.
+     * @throws IllegalArgumentException if initialDelay is null or if either argument is less than
      *                                  or equal to zero.
      */
-    public ExponentialDelayPatientRetryStrategy(int base, Duration initialDelay) {
+    public ExponentialDelayPatientRetryHandler(int base,
+                                               Duration initialDelay) {
         this.base = validate().that(base).isStrictlyPositive();
         this.initialDelay = validate().that(initialDelay).isStrictlyPositive();
     }
 
     @Override
-    protected Supplier<Duration> getDelayDurationsSupplier() {
+    protected Supplier<Duration> getRetryHandlerDurationSupplier() {
         return new Supplier<Duration>() {
 
             private int currentCount = 0;

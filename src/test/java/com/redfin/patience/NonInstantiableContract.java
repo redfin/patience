@@ -28,27 +28,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * A test contract that should be implemented by all types that are intended
- * to be static only (i.e. a class that should never be instantiated). This
- * will verify that the class conforms to being a true static class.
- * <p>
- * A non-instantiable class should:<br>
- * <ul>
- * <li>be marked as final</li>
- * <li>have only a single, private, non-argument constructor</li>
- * <li>throw an {@link AssertionError} if the constructor is called via reflection</li>
- * <li>have only static members</li>
- * <li>have only static methods</li>
- * </ul>
- *
- * @param <T> the class that is being tested.
- */
 interface NonInstantiableContract<T> {
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Test contract requirements
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Test constants, requirements, and helpers
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     /**
      * @return the class object of the class being tested.
@@ -56,9 +40,9 @@ interface NonInstantiableContract<T> {
      */
     Class<T> getClassObject_NonInstantiableContract();
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Test cases
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Test
     default void testClassIsMarkedAsFinal_NonInstantiableContract() {

@@ -21,21 +21,23 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-final class PatientSleepTest implements NonInstantiableContract<PatientSleep> {
+final class PatientSleepTest
+ implements NonInstantiableContract<PatientSleep> {
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Test contract requirements, constants & helpers
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Test constants, requirements, and helpers
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Override
     public Class<PatientSleep> getClassObject_NonInstantiableContract() {
         return PatientSleep.class;
     }
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Test cases
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Test
     void testSleepForThrowsExceptionForNullDuration() {
@@ -69,5 +71,22 @@ final class PatientSleepTest implements NonInstantiableContract<PatientSleep> {
         Duration duration = Duration.ofSeconds(Long.MAX_VALUE);
         Assertions.assertThrows(ArithmeticException.class,
                                 () -> PatientSleep.sleepFor(duration));
+    }
+
+    @Test
+    void testSleepForThrowsForInterrupted() throws Exception {
+        AtomicBoolean interrupted = new AtomicBoolean(false);
+        Thread thread = new Thread(() -> {
+            try {
+                PatientSleep.sleepFor(Duration.ofMinutes(10));
+            } catch (PatientInterruptedException thrown) {
+                interrupted.set(true);
+            }
+        });
+        thread.start();
+        thread.interrupt();
+        Assertions.assertTimeout(Duration.ofSeconds(5),
+                                 interrupted::get,
+                                 "The patient interrupted exception should have been thrown");
     }
 }
