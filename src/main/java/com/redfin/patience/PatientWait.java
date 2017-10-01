@@ -32,7 +32,7 @@ public final class PatientWait {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private static final String DEFAULT_FAILURE_MESSAGE = "Didn't receive a valid result from the executable within the given timeout";
-    private static final Predicate<?> DEFAULT_FILTER = t -> null != t && (!(t instanceof Boolean) || !(Boolean) t);
+    private static final Predicate<?> DEFAULT_FILTER = t -> null != t && (!(t instanceof Boolean) || (Boolean) t);
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Instance Fields & Methods
@@ -119,19 +119,17 @@ public final class PatientWait {
      */
     public <T> PatientFuture<T> from(Executable<T> executable) {
         validate().that(executable).isNotNull();
-        @SuppressWarnings("unchecked")
-        Predicate<T> filter = (Predicate<T>) DEFAULT_FILTER;
         return new PatientFuture<>(initialDelay,
                                    defaultTimeout,
                                    retryHandler,
                                    executionHandler,
                                    executable,
-                                   filter,
+                                   getDefaultFilter(),
                                    DEFAULT_FAILURE_MESSAGE);
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Builder
+    // Static Methods
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     /**
@@ -146,6 +144,15 @@ public final class PatientWait {
     public static PatientWait.Builder builder() {
         return new Builder();
     }
+
+    @SuppressWarnings("unchecked")
+    public static <T> Predicate<T> getDefaultFilter() {
+        return (Predicate<T>) DEFAULT_FILTER;
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Builder
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     /**
      * A mutable builder class used to generate a {@link PatientWait} instance.

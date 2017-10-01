@@ -295,4 +295,30 @@ final class PatientWaitTest {
                              () -> Assertions.assertTrue(wait.getExecutionHandler() instanceof SimpleExecutionHandler),
                              () -> Assertions.assertTrue(wait.getRetryHandler() instanceof FixedDelayPatientRetryHandler));
     }
+
+    @Test
+    void testDefaultFilterReturnsTrueForTrue() {
+        Assertions.assertTrue(PatientWait.getDefaultFilter().test(true),
+                              "Default filter should return true for a true value.");
+    }
+
+    @Test
+    void testDefaultFilterReturnsFalseForFalse() {
+        Assertions.assertFalse(PatientWait.getDefaultFilter().test(false),
+                               "Default filter should return false for a false value.");
+    }
+
+    @Test
+    void testDefaultFilterReturnsTrueForNonNull() {
+        Assertions.assertTrue(PatientWait.getDefaultFilter().test("hello"),
+                              "Default filter should return true for a non-null, non-boolean value.");
+
+    }
+
+    @Test
+    void testDefaultFilterReturnsFalseForNull() {
+        Assertions.assertFalse(PatientWait.getDefaultFilter().test(null),
+                               "Default filter should return false for a null value.");
+
+    }
 }
