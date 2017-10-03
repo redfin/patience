@@ -18,6 +18,7 @@ package com.redfin.patience;
 
 import java.time.Duration;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static com.redfin.validity.Validity.*;
 
@@ -31,8 +32,13 @@ public final class PatientWait {
     // Constants
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    private static final String DEFAULT_FAILURE_MESSAGE = "Didn't receive a valid result from the executable within the given timeout";
-    private static final Predicate<?> DEFAULT_FILTER = t -> null != t && (!(t instanceof Boolean) || (Boolean) t);
+    private static final Supplier<String> DEFAULT_FAILURE_MESSAGE_SUPPLIER;
+    private static final Predicate<?> DEFAULT_FILTER;
+
+    static {
+        DEFAULT_FAILURE_MESSAGE_SUPPLIER = () -> "Didn't receive a valid result from the executable within the given timeout";
+        DEFAULT_FILTER = t -> null != t && (!(t instanceof Boolean) || (Boolean) t);
+    }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Instance Fields & Methods
@@ -125,7 +131,7 @@ public final class PatientWait {
                                    executionHandler,
                                    executable,
                                    getDefaultFilter(),
-                                   DEFAULT_FAILURE_MESSAGE);
+                                   DEFAULT_FAILURE_MESSAGE_SUPPLIER);
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

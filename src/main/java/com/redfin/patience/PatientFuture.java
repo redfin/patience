@@ -18,6 +18,7 @@ package com.redfin.patience;
 
 import java.time.Duration;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static com.redfin.validity.Validity.*;
 
@@ -39,7 +40,7 @@ public final class PatientFuture<T> {
     private final PatientExecutionHandler executionHandler;
     private final Executable<T> executable;
     private final Predicate<T> filter;
-    private final String failureMessage;
+    private final Supplier<String> failureMessageSupplier;
 
     /**
      * Create a new {@link PatientFuture} instance with the given values.
@@ -60,9 +61,10 @@ public final class PatientFuture<T> {
      * @param filter           the {@link Predicate} to be used to test values from the executable.
      *                         May not be null.
      * @param failureMessage   the String message for the {@link PatientTimeoutException} if no
-     *                         valid value is found within the timeout. May not be null or negative.
+     *                         valid value is found within the timeout.
+     *                         May be null.
      *
-     * @throws IllegalArgumentException if any argument is null, if failureMessage is empty, or if
+     * @throws IllegalArgumentException if any argument other than failureMessage is null or if
      *                                  either initialDelay or defaultTimeout are negative.
      */
     public PatientFuture(Duration initialDelay,
@@ -72,33 +74,85 @@ public final class PatientFuture<T> {
                          Executable<T> executable,
                          Predicate<T> filter,
                          String failureMessage) {
+        this(initialDelay,
+             defaultTimeout,
+             retryHandler,
+             executionHandler,
+             executable,
+             filter,
+             () -> failureMessage);
+    }
+
+    /**
+     * Create a new {@link PatientFuture} instance with the given values.
+     *
+     * @param initialDelay           the {@link Duration} time to sleep when waiting for a value.
+     *                               A value of zero means to not sleep.
+     *                               May not be null or negative.
+     * @param defaultTimeout         the {@link Duration} default maximum wait time. This is used
+     *                               for the {@link #get()} method.
+     *                               A value of zero means to attempt to get a value only once.
+     *                               May not be null or negative.
+     * @param retryHandler           the {@link PatientRetryHandler} to be used for this future.
+     *                               May not be null.
+     * @param executionHandler       the {@link PatientExecutionHandler} to be used for this future.
+     *                               May not be null.
+     * @param executable             the {@link Executable} to be used to retrieve values.
+     *                               May not be null.
+     * @param filter                 the {@link Predicate} to be used to test values from the executable.
+     *                               May not be null.
+     * @param failureMessageSupplier the {@link Supplier} of String messages for the {@link PatientTimeoutException} if no
+     *                               valid value is found within the timeout. May not be null.
+     *
+     * @throws IllegalArgumentException if any argument is null or if
+     *                                  either initialDelay or defaultTimeout are negative.
+     */
+    public PatientFuture(Duration initialDelay,
+                         Duration defaultTimeout,
+                         PatientRetryHandler retryHandler,
+                         PatientExecutionHandler executionHandler,
+                         Executable<T> executable,
+                         Predicate<T> filter,
+                         Supplier<String> failureMessageSupplier) {
         this.initialDelay = validate().that(initialDelay).isAtLeast(Duration.ZERO);
         this.defaultTimeout = validate().that(defaultTimeout).isAtLeast(Duration.ZERO);
         this.retryHandler = validate().that(retryHandler).isNotNull();
         this.executionHandler = validate().that(executionHandler).isNotNull();
         this.executable = validate().that(executable).isNotNull();
         this.filter = validate().that(filter).isNotNull();
-        this.failureMessage = validate().that(failureMessage).isNotEmpty();
+        this.failureMessageSupplier = validate().that(failureMessageSupplier).isNotNull();
     }
 
     /**
      * @param failureMessage the String message to be given to the {@link PatientTimeoutException}
      *                       if no valid result is found within the timeout.
-     *                       May not be null or empty.
      *
-     * @return a new {@link PatientFuture} instance with the current values and the given message.
-     *
-     * @throws IllegalArgumentException if failureMessage is null or empty.
+     * @return a new {@link PatientFuture} instance with the current values and the given failure message.
      */
     public PatientFuture<T> withMessage(String failureMessage) {
         validate().that(failureMessage).isNotEmpty();
+        return withMessage(() -> failureMessage);
+    }
+
+    /**
+     * @param failureMessageSupplier the String supplier to be used to generate the failure message
+     *                               for the {@link PatientTimeoutException} if no valid result is
+     *                               found within the timeout.
+     *
+     * @return a new {@link PatientFuture} instance with the current values and
+     * the given failure message supplier.
+     *
+     * @throws IllegalArgumentException if failureMessageSupplier is null.
+     */
+    public PatientFuture<T> withMessage(Supplier<String> failureMessageSupplier) {
+        validate().that(failureMessageSupplier).isNotNull();
         return new PatientFuture<>(initialDelay,
                                    defaultTimeout,
                                    retryHandler,
                                    executionHandler,
                                    executable,
                                    filter,
-                                   failureMessage);
+                                   failureMessageSupplier);
     }
 
     /**
@@ -118,7 +172,7 @@ public final class PatientFuture<T> {
                                    executionHandler,
                                    executable,
                                    filter,
-                                   failureMessage);
+                                   failureMessageSupplier);
     }
 
     /**
@@ -171,7 +225,7 @@ public final class PatientFuture<T> {
         if (result.isSuccess()) {
             return result.getResult();
         } else {
-            throw new PatientTimeoutException(failureMessage, result.getFailedAttemptDescriptions());
+            throw new PatientTimeoutException(failureMessageSupplier.get(), result.getFailedAttemptDescriptions());
         }
     }
 
@@ -203,7 +257,7 @@ public final class PatientFuture<T> {
         return filter;
     }
 
-    String getFailureMessage() {
-        return failureMessage;
+    Supplier<String> getFailureMessageSupplier() {
+        return failureMessageSupplier;
     }
 }

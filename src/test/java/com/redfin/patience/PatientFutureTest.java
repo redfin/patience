@@ -33,13 +33,17 @@ final class PatientFutureTest {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private PatientFuture<Boolean> getInstance() {
+        return getInstance("Start message");
+    }
+
+    private PatientFuture<Boolean> getInstance(String message) {
         return getInstance(Duration.ZERO,
                            Duration.ZERO,
                            new FixedDelayPatientRetryHandler(Duration.ZERO),
                            new SimpleExecutionHandler(),
                            () -> true,
                            bool -> null != bool && bool,
-                           "Whoops");
+                           message);
     }
 
     private PatientFuture<Boolean> getInstance(Duration initialDelay,
@@ -58,14 +62,58 @@ final class PatientFutureTest {
                                    failureMessage);
     }
 
+    private PatientFuture<Boolean> getInstance(Supplier<String> messageSupplier) {
+        return getInstance(Duration.ZERO,
+                           Duration.ZERO,
+                           new FixedDelayPatientRetryHandler(Duration.ZERO),
+                           new SimpleExecutionHandler(),
+                           () -> true,
+                           bool -> null != bool && bool,
+                           messageSupplier);
+    }
+
+    private PatientFuture<Boolean> getInstance(Duration initialDelay,
+                                               Duration defaultTimeout,
+                                               PatientRetryHandler retryHandler,
+                                               PatientExecutionHandler executionHandler,
+                                               Executable<Boolean> executable,
+                                               Predicate<Boolean> filter,
+                                               Supplier<String> failureMessageSupplier) {
+        return new PatientFuture<>(initialDelay,
+                                   defaultTimeout,
+                                   retryHandler,
+                                   executionHandler,
+                                   executable,
+                                   filter,
+                                   failureMessageSupplier);
+    }
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Test cases
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Test
     void testCanInstantiate() {
-        Assertions.assertNotNull(getInstance(),
+        Assertions.assertNotNull(getInstance("Whoops"),
                                  "Should be able to instantiate a PatientFuture");
+    }
+
+    @Test
+    void testCanInstantiateWithSupplier() {
+        Assertions.assertNotNull(getInstance(() -> "hello"),
+                                 "Should be able to instantiate a PatientFuture");
+    }
+
+    @Test
+    void testCanInstantiateWithEmptyFailureMessage() {
+        Assertions.assertNotNull(getInstance(""),
+                                 "Should be able to instantiate with an empty failure message.");
+    }
+
+    @Test
+    void testCanInstantiateWithNullFailureMessage() {
+        Assertions.assertNotNull(getInstance((String) null),
+                                 "Should be able to instantiate with a null failure message.");
     }
 
     @Test
@@ -88,22 +136,22 @@ final class PatientFutureTest {
                                                            "Should return the given initial delay"),
                              () -> Assertions.assertEquals(durations,
                                                            future.getDefaultTimeout(),
-                                                           "Should return the given initial delay"),
+                                                           "Should return the given default timeout"),
                              () -> Assertions.assertEquals(retryHandler,
                                                            future.getRetryHandler(),
-                                                           "Should return the given initial delay"),
+                                                           "Should return the given retry handler"),
                              () -> Assertions.assertEquals(executionHandler,
                                                            future.getExecutionHandler(),
-                                                           "Should return the given initial delay"),
+                                                           "Should return the given execution handler"),
                              () -> Assertions.assertEquals(executable,
                                                            future.getExecutable(),
-                                                           "Should return the given initial delay"),
+                                                           "Should return the given executable"),
                              () -> Assertions.assertEquals(filter,
                                                            future.getFilter(),
-                                                           "Should return the given initial delay"),
+                                                           "Should return the given filter"),
                              () -> Assertions.assertEquals(failureMessage,
-                                                           future.getFailureMessage(),
-                                                           "Should return the given initial delay"));
+                                                           future.getFailureMessageSupplier().get(),
+                                                           "Should return the given failure message"));
     }
 
     @Test
@@ -159,7 +207,7 @@ final class PatientFutureTest {
     }
 
     @Test
-    void testThrowsForRetryHandler() {
+    void testThrowsForNullRetryHandler() {
         Assertions.assertThrows(IllegalArgumentException.class,
                                 () -> getInstance(Duration.ZERO,
                                                   Duration.ZERO,
@@ -211,29 +259,10 @@ final class PatientFutureTest {
     }
 
     @Test
-    void testThrowsForNullFailureMessage() {
+    void testThrowsWithNullFailureMessageSupplier() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> getInstance(Duration.ZERO,
-                                                  Duration.ZERO,
-                                                  new FixedDelayPatientRetryHandler(Duration.ZERO),
-                                                  new SimpleExecutionHandler(),
-                                                  () -> true,
-                                                  bool -> null != bool && bool,
-                                                  null),
-                                "Should throw for a null failure message");
-    }
-
-    @Test
-    void testThrowsForAnEmptyFailureMessage() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> getInstance(Duration.ZERO,
-                                                  Duration.ZERO,
-                                                  new FixedDelayPatientRetryHandler(Duration.ZERO),
-                                                  new SimpleExecutionHandler(),
-                                                  () -> true,
-                                                  bool -> null != bool && bool,
-                                                  ""),
-                                "Should throw for an empty failure message");
+                                () -> getInstance((Supplier<String>) null),
+                                "Should throw an exception for a null failure message supplier");
     }
 
     @Test
@@ -241,14 +270,15 @@ final class PatientFutureTest {
         String message = "ha";
         Assertions.assertEquals(message,
                                 getInstance().withMessage(message)
-                                             .getFailureMessage(),
+                                             .getFailureMessageSupplier()
+                                             .get(),
                                 "Should return a future from withMessage(String) that has the given failure message");
     }
 
     @Test
     void testWithFailureMessageThrowsForNullMessage() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> getInstance().withMessage(null),
+                                () -> getInstance().withMessage((String) null),
                                 "Should throw for withMessage(String) with a null argument");
     }
 
@@ -257,6 +287,13 @@ final class PatientFutureTest {
         Assertions.assertThrows(IllegalArgumentException.class,
                                 () -> getInstance().withMessage(""),
                                 "Should throw for withMessage(String) with an empty argument");
+    }
+
+    @Test
+    void testWithFailureMessageThrowsForNullSupplier() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                                () -> getInstance().withMessage((Supplier<String>) null),
+                                "Should throw for withMessage(Supplier<String>) with a null argument");
     }
 
     @Test
