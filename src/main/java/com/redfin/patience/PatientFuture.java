@@ -130,7 +130,6 @@ public final class PatientFuture<T> {
      * @return a new {@link PatientFuture} instance with the current values and the given failure message.
      */
     public PatientFuture<T> withMessage(String failureMessage) {
-        validate().that(failureMessage).isNotEmpty();
         return withMessage(() -> failureMessage);
     }
 

@@ -277,16 +277,14 @@ final class PatientFutureTest {
 
     @Test
     void testWithFailureMessageThrowsForNullMessage() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> getInstance().withMessage((String) null),
-                                "Should throw for withMessage(String) with a null argument");
+        Assertions.assertNotNull(getInstance().withMessage((String) null),
+                                 "Should be able to give a null message to the withMessage(String) method.");
     }
 
     @Test
-    void testWithFailureMessageThrowsForEmptyMessage() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> getInstance().withMessage(""),
-                                "Should throw for withMessage(String) with an empty argument");
+    void testWithFailureMessageReturnsNonNullForEmptyMessage() {
+        Assertions.assertNotNull(getInstance().withMessage(""),
+                                 "Should be able to give an empty message to the withMessage(String) method.");
     }
 
     @Test
