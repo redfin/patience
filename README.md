@@ -46,7 +46,7 @@ Finally you would call `get` to begin waiting.
 PatientWait wait = PatientWait.builder()
                               .withInitialDelay(Duration.ofSeconds(1))
                               .withDefaultTimeout(Duration.ofMinutes(2))
-                              .withRetryHadler(PatientRetryHandlers.fixedDelay(Duration.ofMillis(500)))
+                              .withRetryHandler(PatientRetryHandlers.fixedDelay(Duration.ofMillis(500)))
                               .withExecutionHandler(PatientExecutionHandlers.simple())
                               .build();
 double result = wait.from(Math::random)
