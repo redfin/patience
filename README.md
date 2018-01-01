@@ -62,6 +62,21 @@ If the generated value doesn't pass the filter, then the executing thread will s
 If no valid value is generated and 2 minutes has been reached (or less if the next sleep would put the execution over the timeout period)
  then a `PatientTimeoutException` will be thrown with the given message.
 
+If you just need to check if a valid result is ever found within a given timeout and
+you don't want an exception thrown if it is not, there is also a `check` method available.
+
+```java
+PatientWait wait = PatientWait.builder()
+                              .withInitialDelay(Duration.ofSeconds(1))
+                              .withDefaultTimeout(Duration.ofMinutes(2))
+                              .withRetryHandler(PatientRetryHandlers.fixedDelay(Duration.ofMillis(500)))
+                              .withExecutionHandler(PatientExecutionHandlers.simple())
+                              .build();
+boolean resultFound = wait.from(Math::random)
+                          .withFilter(dbl -> dbl > 0.5)
+                          .check(Duration.ofMinutes(1));
+```
+
 ## Customization points
 
 The two main customization points of the `Patience` library are the `PatientRetryHandler` and the `PatientExecutionHandler`.
