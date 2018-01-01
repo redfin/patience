@@ -228,6 +228,46 @@ public final class PatientFuture<T> {
         }
     }
 
+    /**
+     * This is the same as calling {@link #check(Duration)} with the default timeout
+     * duration for this patient future.
+     *
+     * @return the true if a valid result is found before the timeout or false
+     * otherwise.
+     */
+    public boolean check() {
+        return check(defaultTimeout);
+    }
+
+    /**
+     * Begin executing the patient wait in the following way:
+     * <ul>
+     * <li>Sleep for the initial delay, if any.</li>
+     * <li>Use the given retry handler and execution handler to begin execution.</li>
+     * <li>If a successful {@link PatientResult} is returned from the retry handler then return true.</li>
+     * <li>If the {@link PatientResult} is not successful then return false.</li>
+     * </ul>
+     *
+     * @param timeout the {@link Duration} that represents the maximum amount
+     *                of time to try to find a valid result. Note that a failure
+     *                can occur before the timeout is reached depending upon the
+     *                {@link PatientRetryHandler}.
+     *                A value of zero means only attempt to get a value once.
+     *                May not be null or negative.
+     *
+     * @return true if a successful value is found before the timeout or false otherwise.
+     *
+     * @throws IllegalArgumentException if timeout is null or negative.
+     */
+    public boolean check(Duration timeout) {
+        try {
+            get(timeout);
+            return true;
+        } catch (PatientTimeoutException ignore) {
+            return false;
+        }
+    }
+
     // ----------------------------------------------------
     // Package-private methods for testing
     // ----------------------------------------------------

@@ -370,4 +370,30 @@ final class PatientFutureTest {
                                 future::get,
                                 "Should throw from get if the retry handler returns a null result");
     }
+
+    @Test
+    void testCheckReturnsTrueWhenSuccessful() {
+        PatientFuture<Boolean> future = getInstance(Duration.ZERO,
+                                                    Duration.ZERO,
+                                                    new FixedDelayPatientRetryHandler(Duration.ofMillis(1)),
+                                                    new SimpleExecutionHandler(),
+                                                    () -> true,
+                                                    bool -> null != bool && bool,
+                                                    "whoops");
+        Assertions.assertTrue(future.check(),
+                              "Should return true when successful.");
+    }
+
+    @Test
+    void testCheckReturnsFalseWhenUnsuccessful() {
+        PatientFuture<Boolean> future = getInstance(Duration.ZERO,
+                                                    Duration.ZERO,
+                                                    new FixedDelayPatientRetryHandler(Duration.ofMillis(1)),
+                                                    new SimpleExecutionHandler(),
+                                                    () -> false,
+                                                    bool -> null != bool && bool,
+                                                    "whoops");
+        Assertions.assertFalse(future::check,
+                                "Should return false when unsuccessful.");
+    }
 }
