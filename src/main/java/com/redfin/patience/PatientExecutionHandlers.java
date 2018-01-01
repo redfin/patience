@@ -21,6 +21,8 @@ import com.redfin.patience.executions.SimpleExecutionHandler;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A static, non-instantiable, class for obtaining instances of different
@@ -41,8 +43,13 @@ public final class PatientExecutionHandlers {
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Static Methods
+    // Static Methods and Fields
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    private static final Set<Class<? extends Throwable>> NOT_IGNORED_CLASSES = new HashSet<>();
+    static {
+        NOT_IGNORED_CLASSES.add(OutOfMemoryError.class);
+    }
 
     /**
      * @return a new {@link SimpleExecutionHandler} instance.
@@ -54,7 +61,9 @@ public final class PatientExecutionHandlers {
     /**
      * @param ignoredThrowableTypes the collection of class throwable classes that should be ignored.
      *                              A null or empty array will return an execution handler that
-     *                              doesn't ignore any throwable that is thrown.
+     *                              doesn't ignore any throwable that is thrown. Note that {@link OutOfMemoryError}s are
+     *                              explicitly NOT ignored even if added to the argument array. If you want to ignore
+     *                              them, then you need to create an {@link IgnoringExecutionHandler} directly.
      *
      * @return a new {@link IgnoringExecutionHandler} instance that ignores the given types.
      */
@@ -66,19 +75,21 @@ public final class PatientExecutionHandlers {
     /**
      * @param ignoredThrowableTypes the collection of class throwable classes that should be ignored.
      *                              A null or empty collection will return an execution handler that
-     *                              doesn't ignore any throwable that is thrown.
+     *                              doesn't ignore any throwable that is thrown. Note that {@link OutOfMemoryError}s are
+     *                              explicitly NOT ignored even if added to the argument array. If you want to ignore
+     *                              them, then you need to create an {@link IgnoringExecutionHandler} directly.
      *
      * @return a new {@link IgnoringExecutionHandler} instance that ignores the given types.
      */
     public static PatientExecutionHandler ignoring(Collection<Class<? extends Throwable>> ignoredThrowableTypes) {
-        return new IgnoringExecutionHandler(ignoredThrowableTypes);
+        return new IgnoringExecutionHandler(ignoredThrowableTypes, NOT_IGNORED_CLASSES);
     }
 
     /**
      * @return a new {@link IgnoringExecutionHandler} instance that ignores all
-     * Throwable types.
+     * Exception types, though not Errors.
      */
     public static PatientExecutionHandler ignoringAll() {
-        return ignoring(Throwable.class);
+        return ignoring(Exception.class);
     }
 }

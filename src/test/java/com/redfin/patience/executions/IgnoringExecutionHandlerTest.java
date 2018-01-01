@@ -39,6 +39,11 @@ final class IgnoringExecutionHandlerTest
         return new IgnoringExecutionHandler(ignoredThrowableTypes);
     }
 
+    private IgnoringExecutionHandler getInstance(Collection<Class<? extends Throwable>> ignoredThrowableTypes,
+                                                 Collection<Class<? extends Throwable>> notIgnoredThrowableTypes) {
+        return new IgnoringExecutionHandler(ignoredThrowableTypes, notIgnoredThrowableTypes);
+    }
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Test cases
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -102,6 +107,14 @@ final class IgnoringExecutionHandlerTest
     void testDoesNotThrowForIgnoredSuperTypeFromFilter() {
         getInstance(Collections.singletonList(RuntimeException.class)).execute(() -> true,
                                                                                bool -> { throw new IllegalArgumentException("whoops"); });
+    }
 
+    @Test
+    void testDoesNotIgnoreDoNotIgnoreThrowable() {
+        Assertions.assertThrows(PatientExecutionException.class,
+                                () -> getInstance(Collections.singleton(Throwable.class),
+                                                  Collections.singletonList(OutOfMemoryError.class)).execute(() -> true,
+                                                                                                             bool -> { throw new OutOfMemoryError("whoops"); }),
+        "Should propagate an exception on not ignored throwable.");
     }
 }

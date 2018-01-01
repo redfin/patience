@@ -44,21 +44,50 @@ public final class IgnoringExecutionHandler
         implements PatientExecutionHandler {
 
     private final Set<Class<? extends Throwable>> ignoredThrowableTypes;
+    private final Set<Class<? extends Throwable>> notIgnoredThrowableTypes;
 
     /**
      * Create a new {@link IgnoringExecutionHandler} with the collection of types
-     * to be ignored. If the collection is null or empty then no thrown types will be
+     * to be ignored. If the collection of ignored is null or empty then no thrown types will be
      * ignored.
      *
-     * @param ignoredThrowableTypes the collection of Throwable classes to be ignored.
+     * @param ignoredThrowableTypes    the collection of Throwable classes to be ignored.
+     *                                 Note that Throwable is considered a match to an element of
+     *                                 this collection even if it is a subclass of a type of the element.
      */
     public IgnoringExecutionHandler(Collection<Class<? extends Throwable>> ignoredThrowableTypes) {
+        this(ignoredThrowableTypes, null);
+    }
+
+    /**
+     * Create a new {@link IgnoringExecutionHandler} with the collection of types
+     * to be ignored. If the collection of ignored is null or empty then no thrown types will be
+     * ignored.
+     *
+     * @param ignoredThrowableTypes    the collection of Throwable classes to be ignored.
+     *                                 Note that Throwable is considered a match to an element of
+     *                                 this collection even if it is a subclass of a type of the element.
+     * @param notIgnoredThrowableTypes the collection of Throwable classes explicitly not ignored
+     *                                 even if they or a super class are in the ignoredThrowableTypes
+     *                                 collection. Note that a Throwable is only considered to be a match
+     *                                 to elements of this collection if it is an exact type matches, not
+     *                                 a subclasse of an element of this collection.
+     */
+    public IgnoringExecutionHandler(Collection<Class<? extends Throwable>> ignoredThrowableTypes,
+                                    Collection<Class<? extends Throwable>> notIgnoredThrowableTypes) {
         if (null == ignoredThrowableTypes) {
             this.ignoredThrowableTypes = new HashSet<>();
         } else {
             this.ignoredThrowableTypes = ignoredThrowableTypes.stream()
                                                               .filter(Objects::nonNull)
                                                               .collect(Collectors.toSet());
+        }
+        if (null == notIgnoredThrowableTypes) {
+            this.notIgnoredThrowableTypes = new HashSet<>();
+        } else {
+            this.notIgnoredThrowableTypes = notIgnoredThrowableTypes.stream()
+                                                                    .filter(Objects::nonNull)
+                                                                    .collect(Collectors.toSet());
         }
     }
 
@@ -76,14 +105,18 @@ public final class IgnoringExecutionHandler
                 return PatientExecutionResult.fail(ValidityUtils.describe(value));
             }
         } catch (Throwable thrown) {
-            // Check if the thrown throwable was an ignored type
-            if (ignoredThrowableTypes.stream()
-                                     .anyMatch(clazz -> clazz.isAssignableFrom(thrown.getClass()))) {
-                // This is an ignored throwable type, simply return a failure result
+            String errorMessage = "Unexpected throwable caught while waiting patiently.";
+            // Check the type of the throwable
+            if (notIgnoredThrowableTypes.stream().anyMatch(clazz -> clazz.equals(thrown.getClass()))) {
+                // It was explicitly not ignored, throw an exception
+                throw new PatientExecutionException(errorMessage, thrown);
+            } else if (ignoredThrowableTypes.stream()
+                                            .anyMatch(clazz -> clazz.isAssignableFrom(thrown.getClass()))) {
+                // It was ignored and not explicitly NOT ignored, return a failure case
                 return PatientExecutionResult.fail("Caught throwable: " + thrown.toString());
             } else {
-                // This was not an ignored throwable type, propagate it
-                throw new PatientExecutionException("Unexpected throwable caught while waiting patiently.", thrown);
+                // It was neither ignored or not ignored, throw an exception
+                throw new PatientExecutionException(errorMessage, thrown);
             }
         }
     }
