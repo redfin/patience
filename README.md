@@ -33,8 +33,12 @@ A `PatientFuture` is also immutable but not intended to be re-used.
 You can supply a custom filter (`Predicate` with which to test results) and a string to use as a message
  if the expected condition never occurs.
 You begin actually waiting for a result by calling the `get()` or `get(Duration)` methods on the `PatientFuture` object.
+
 If the `Executable` returns a valid result within the timeout then the result will be returned from `get`.
 If no valid result is found within the timeout, then a `PatientTimeoutException` will be thrown.
+Note that the actual execution of the code in the `from(Executable)` block will not be interrupted even if it takes longer than
+the given duration so it is possible to receive a valid result from the `PatientWait` even if it takes longer
+than the duration given to the `get(Duration)` method.
 
 ## Example usage
 
