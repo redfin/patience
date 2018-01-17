@@ -17,14 +17,14 @@
 package com.redfin.patience;
 
 /**
- * An {@link Executable} represents a block of code that can be executed and which
+ * An {@link PatientExecutable} represents a block of code that can be executed and which
  * will return a value. It can throw any type of Throwable without handling it, even
  * checked exceptions.
  *
  * @param <T> the type to be returned from the execute method.
  */
 @FunctionalInterface
-public interface Executable<T> {
+public interface PatientExecutable<T> {
 
     /**
      * Actually execute some code. The code should either return a value

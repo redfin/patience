@@ -16,26 +16,28 @@
 
 package com.redfin.patience;
 
+import com.redfin.patience.exceptions.PatientExecutionException;
+
 import java.util.function.Predicate;
 
 /**
  * A PatientExecutionHandler is one of the main customization points in the
  * Patience library. An instance of this type defines the behavior around
- * extracting a value from an {@link Executable} and testing that value with
+ * extracting a value from an {@link PatientExecutable} and testing that value with
  * a {@link Predicate}.
  */
 @FunctionalInterface
 public interface PatientExecutionHandler {
 
     /**
-     * Extract a value from the given {@link Executable} and test the retrieved value with
+     * Extract a value from the given {@link PatientExecutable} and test the retrieved value with
      * the given {@link Predicate} filter. If the value passes the predicate test then return
      * a passing {@link PatientExecutionResult} with the value. If it fails the test then it
      * should return a failing {@link PatientExecutionResult} with a description of the attempt.
      * Any unexpected errors or exceptions should be wrapped in a {@link PatientExecutionException}
      * and thrown.
      *
-     * @param executable the {@link Executable} to use to retrieve a value.
+     * @param executable the {@link PatientExecutable} to use to retrieve a value.
      *                   May not be null.
      * @param filter     the {@link Predicate} to test the retrieved value with.
      *                   May not be null.
@@ -47,6 +49,6 @@ public interface PatientExecutionHandler {
      * @throws PatientExecutionException if an unexpected Throwable is thrown during the
      *                                   execution of executable or testing the returned results with the given filter.
      */
-    <T> PatientExecutionResult<T> execute(Executable<T> executable,
+    <T> PatientExecutionResult<T> execute(PatientExecutable<T> executable,
                                           Predicate<T> filter);
 }

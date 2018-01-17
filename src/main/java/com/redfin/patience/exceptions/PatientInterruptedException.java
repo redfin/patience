@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.redfin.patience;
+package com.redfin.patience.exceptions;
 
 /**
  * A PatientInterruptedException is an unchecked exception. It is intended
@@ -24,7 +24,7 @@ package com.redfin.patience;
 public final class PatientInterruptedException
            extends RuntimeException {
 
-    static final long serialVersionUID = 3L;
+    static final long serialVersionUID = 5L;
 
     /**
      * Constructs a new patience exception with {@code null} as its
@@ -46,6 +46,18 @@ public final class PatientInterruptedException
     }
 
     /**
+     * Constructs a new patience exception with the specified cause.
+     * The message will be null, if the cause is null, or the result of
+     * calling {@link Object#toString()} on the given cause.
+     *
+     * @param cause the cause of the exception. If {@code null} then it is the
+     *              same as calling {@link #PatientInterruptedException()}.
+     */
+    public PatientInterruptedException(Throwable cause) {
+        super(cause);
+    }
+
+    /**
      * Constructs a new patience exception with the specified detail message and
      * cause.
      *
@@ -56,16 +68,5 @@ public final class PatientInterruptedException
      */
     public PatientInterruptedException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    /**
-     * Constructs a new patience exception with the specified cause.
-     * The message will be {@code null}.
-     *
-     * @param cause the cause of the exception. If {@code null} then it is the
-     *              same as calling {@link #PatientInterruptedException()}.
-     */
-    public PatientInterruptedException(Throwable cause) {
-        super(cause);
     }
 }

@@ -14,33 +14,41 @@
  * limitations under the License.
  */
 
-package com.redfin.patience;
+package com.redfin.patience.exceptions;
 
-final class PatientInterruptedExceptionTest
- implements ExceptionContract<PatientInterruptedException> {
+import org.junit.jupiter.api.DisplayName;
+
+@DisplayName("When a PatientException")
+final class PatientExceptionTest
+    extends AbstractExceptionTest<PatientException> {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Test constants, requirements, and helpers
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Override
-    public PatientInterruptedException getInstance() {
-        return new PatientInterruptedException();
+    protected PatientException getInstance() {
+        return new PatientException();
     }
 
     @Override
-    public PatientInterruptedException getInstance(String message) {
-        return new PatientInterruptedException(message);
+    protected PatientException getInstance(String message) {
+        return new PatientException(message);
     }
 
     @Override
-    public PatientInterruptedException getInstance(Throwable cause) {
-        return new PatientInterruptedException(cause);
+    protected PatientException getInstance(Throwable cause) {
+        return new PatientException(cause);
     }
 
     @Override
-    public PatientInterruptedException getInstance(String message,
-                                                   Throwable cause) {
-        return new PatientInterruptedException(message, cause);
+    protected PatientException getInstance(String message,
+                                           Throwable cause) {
+        return new PatientException(message, cause);
+    }
+
+    @Override
+    protected Class<PatientException> getClassUnderTest() {
+        return PatientException.class;
     }
 }

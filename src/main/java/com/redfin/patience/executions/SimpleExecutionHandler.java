@@ -16,9 +16,9 @@
 
 package com.redfin.patience.executions;
 
-import com.redfin.patience.Executable;
-import com.redfin.patience.PatientExecutionException;
+import com.redfin.patience.PatientExecutable;
 import com.redfin.patience.PatientExecutionHandler;
+import com.redfin.patience.exceptions.PatientExecutionException;
 import com.redfin.patience.PatientExecutionResult;
 import com.redfin.validity.ValidityUtils;
 
@@ -36,7 +36,7 @@ public final class SimpleExecutionHandler
         implements PatientExecutionHandler {
 
     @Override
-    public <T> PatientExecutionResult<T> execute(Executable<T> executable,
+    public <T> PatientExecutionResult<T> execute(PatientExecutable<T> executable,
                                                  Predicate<T> filter) {
         validate().that(executable).isNotNull();
         validate().that(filter).isNotNull();

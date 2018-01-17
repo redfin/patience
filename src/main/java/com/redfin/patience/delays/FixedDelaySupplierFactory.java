@@ -14,24 +14,27 @@
  * limitations under the License.
  */
 
-package com.redfin.patience.retries;
+package com.redfin.patience.delays;
+
+import com.redfin.patience.DelaySupplierFactory;
 
 import java.time.Duration;
 import java.util.function.Supplier;
 
-import static com.redfin.validity.Validity.*;
+import static com.redfin.validity.Validity.validate;
 
 /**
- * An implementation of {@link com.redfin.patience.PatientRetryHandler} that
- * waits the same amount of time between each execution attempts
+ * An implementation of {@link DelaySupplierFactory} that creates a
+ * {@link Supplier} of {@link Duration}s that return a fixed
+ * {@link Duration} for each call to {@link Supplier#get()}.
  */
-public final class FixedDelayPatientRetryHandler
-           extends AbstractPatientRetryHandler {
+public final class FixedDelaySupplierFactory
+        implements DelaySupplierFactory {
 
-    private final Duration delayDuration;
+    private final Duration duration;
 
     /**
-     * Create a new {@link FixedDelayPatientRetryHandler} instance with the given
+     * Create a new {@link FixedDelaySupplierFactory} instance with the given
      * duration to wait between execution attempts. A duration of zero means that
      * no time should be taken between attempts.
      *
@@ -40,13 +43,14 @@ public final class FixedDelayPatientRetryHandler
      *
      * @throws IllegalArgumentException if delayDuration is null or negative.
      */
-    public FixedDelayPatientRetryHandler(Duration delayDuration) {
-        this.delayDuration = validate().that(delayDuration)
-                                       .isAtLeast(Duration.ZERO);
+    public FixedDelaySupplierFactory(Duration delayDuration) {
+        this.duration = validate().withMessage("Cannot use a null or negative delayDuration.")
+                                  .that(delayDuration)
+                                  .isGreaterThanOrEqualToZero();
     }
 
     @Override
-    protected Supplier<Duration> getRetryHandlerDurationSupplier() {
-        return () -> delayDuration;
+    public Supplier<Duration> create() {
+        return () -> duration;
     }
 }

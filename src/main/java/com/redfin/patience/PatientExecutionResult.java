@@ -21,8 +21,7 @@ import static com.redfin.validity.Validity.*;
 /**
  * A PatientExecutionResult is an immutable object that signifies the outcome of a single
  * execution attempt while patiently waiting and is returned by a {@link PatientExecutionHandler}.
- * It will have either the successful result or a String description
- * of the failed attempt.
+ * It will contain either a result or a String description of the failed attempt.
  *
  * @param <T> the type of the result.
  */
@@ -99,11 +98,11 @@ public final class PatientExecutionResult<T> {
      *
      * @return a new {@link PatientExecutionResult} instance that is not successful and
      * has the given failure description.
-     *
-     * @throws IllegalArgumentException if failedAttemptDescription is null or empty.
      */
     public static <T> PatientExecutionResult<T> fail(String failedAttemptDescription) {
-        validate().that(failedAttemptDescription).isNotEmpty();
+        if (null == failedAttemptDescription || failedAttemptDescription.isEmpty()) {
+            failedAttemptDescription = "Failed execution attempt";
+        }
         return new PatientExecutionResult<>(null, failedAttemptDescription);
     }
 }

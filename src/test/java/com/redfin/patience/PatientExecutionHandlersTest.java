@@ -17,11 +17,14 @@
 package com.redfin.patience;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.Collections;
 
+@DisplayName("PatientExecutionHandlers")
 final class PatientExecutionHandlersTest
  implements NonInstantiableContract<PatientExecutionHandlers> {
 
@@ -38,57 +41,91 @@ final class PatientExecutionHandlersTest
     // Test cases
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    @Test
-    void testReturnsNonNullForSimple() {
-        Assertions.assertNotNull(PatientExecutionHandlers.simple(),
-                                 "Should be able to receive a non-null execution handler.");
+    @Nested
+    @DisplayName("when simple() is called")
+    final class Simple {
+
+        @Test
+        @DisplayName("it returns a non-null execution handler")
+        void testReturnsNonNullForSimple() {
+            Assertions.assertNotNull(PatientExecutionHandlers.simple(),
+                                     "Should be able to receive a non-null execution handler.");
+        }
     }
 
-    @Test
-    void testReturnsNonNullForIgnoringWithNoArguments() {
-        Assertions.assertNotNull(PatientExecutionHandlers.ignoring(),
-                                 "Should be able to receive a non-null execution handler.");
+    @Nested
+    @DisplayName("when ignoring() is called")
+    final class Ignoring {
+
+        @Test
+        @DisplayName("it returns a non-null execution handler")
+        void testReturnsNonNullForIgnoringWithNoArguments() {
+            Assertions.assertNotNull(PatientExecutionHandlers.ignoring(),
+                                     "Should be able to receive a non-null execution handler.");
+        }
     }
 
-    @Test
-    void testReturnsNonNullForIgnoringWithOneArgument() {
-        Assertions.assertNotNull(PatientExecutionHandlers.ignoring(RuntimeException.class),
-                                 "Should be able to receive a non-null execution handler.");
+    @Nested
+    @DisplayName("when ignoring(Class<? extends Throwable>[]) is called")
+    final class IgnoringArray {
+
+        @Test
+        @DisplayName("it returns a non-null execution handler for a single argument")
+        void testReturnsNonNullForIgnoringWithOneArgument() {
+            Assertions.assertNotNull(PatientExecutionHandlers.ignoring(RuntimeException.class),
+                                     "Should be able to receive a non-null execution handler.");
+        }
+
+        @Test
+        @DisplayName("it returns a non-null execution handler for two arguments")
+        void testReturnsNonNullForIgnoringWithTwoArguments() {
+            Assertions.assertNotNull(PatientExecutionHandlers.ignoring(RuntimeException.class, AssertionError.class),
+                                     "Should be able to receive a non-null execution handler.");
+        }
+
+        @Test
+        @DisplayName("it returns a non-null execution handler for a null array")
+        void testReturnsNonNullForIgnoringWithNullArray() {
+            Assertions.assertNotNull(PatientExecutionHandlers.ignoring((Class<? extends Throwable>[]) null),
+                                     "Should be able to receive a non-null execution handler.");
+        }
     }
 
-    @Test
-    void testReturnsNonNullForIgnoringWithTwoArguments() {
-        Assertions.assertNotNull(PatientExecutionHandlers.ignoring(RuntimeException.class, AssertionError.class),
-                                 "Should be able to receive a non-null execution handler.");
+    @Nested
+    @DisplayName("when ignoring(Collection<Class<? extends Throwable>>) is called")
+    final class IgnoringCollection {
+
+        @Test
+        @DisplayName("it returns a non-null execution handler for a null collection")
+        void testReturnsNonNullForIgnoringWithNullCollection() {
+            Assertions.assertNotNull(PatientExecutionHandlers.ignoring((Collection<Class<? extends Throwable>>) null),
+                                     "Should be able to receive a non-null execution handler.");
+        }
+
+        @Test
+        @DisplayName("it returns a non-null execution handler for an empty collection")
+        void testReturnsNonNullForIgnoringWithEmptyCollection() {
+            Assertions.assertNotNull(PatientExecutionHandlers.ignoring(Collections.emptyList()),
+                                     "Should be able to receive a non-null execution handler.");
+        }
+
+        @Test
+        @DisplayName("it returns a non-null execution handler for a non-empty collection")
+        void testReturnsNonNullForIgnoringWithNonEmptyCollection() {
+            Assertions.assertNotNull(PatientExecutionHandlers.ignoring(Collections.singletonList(RuntimeException.class)),
+                                     "Should be able to receive a non-null execution handler.");
+        }
     }
 
-    @Test
-    void testReturnsNonNullForIgnoringWithNullArray() {
-        Assertions.assertNotNull(PatientExecutionHandlers.ignoring((Class<? extends Throwable>[]) null),
-                                 "Should be able to receive a non-null execution handler.");
-    }
+    @Nested
+    @DisplayName("when ignoringAll() is called")
+    final class IgnoringAll {
 
-    @Test
-    void testReturnsNonNullForIgnoringWithNullCollection() {
-        Assertions.assertNotNull(PatientExecutionHandlers.ignoring((Collection<Class<? extends Throwable>>) null),
-                                 "Should be able to receive a non-null execution handler.");
-    }
-
-    @Test
-    void testReturnsNonNullForIgnoringWithEmptyCollection() {
-        Assertions.assertNotNull(PatientExecutionHandlers.ignoring(Collections.emptyList()),
-                                 "Should be able to receive a non-null execution handler.");
-    }
-
-    @Test
-    void testReturnsNonNullForIgnoringWithNonEmptyCollection() {
-        Assertions.assertNotNull(PatientExecutionHandlers.ignoring(Collections.singletonList(RuntimeException.class)),
-                                 "Should be able to receive a non-null execution handler.");
-    }
-
-    @Test
-    void testReturnsNonNullForIgnoringAll() {
-        Assertions.assertNotNull(PatientExecutionHandlers.ignoringAll(),
-                                 "Should be able to receive a non-null execution handler.");
+        @Test
+        @DisplayName("it returns a non-null execution handler")
+        void testReturnsNonNullForIgnoringAll() {
+            Assertions.assertNotNull(PatientExecutionHandlers.ignoringAll(),
+                                     "Should be able to receive a non-null execution handler.");
+        }
     }
 }

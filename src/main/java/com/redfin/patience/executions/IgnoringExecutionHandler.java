@@ -16,9 +16,9 @@
 
 package com.redfin.patience.executions;
 
-import com.redfin.patience.Executable;
-import com.redfin.patience.PatientExecutionException;
+import com.redfin.patience.PatientExecutable;
 import com.redfin.patience.PatientExecutionHandler;
+import com.redfin.patience.exceptions.PatientExecutionException;
 import com.redfin.patience.PatientExecutionResult;
 import com.redfin.validity.ValidityUtils;
 
@@ -71,7 +71,7 @@ public final class IgnoringExecutionHandler
      *                                 even if they or a super class are in the ignoredThrowableTypes
      *                                 collection. Note that a Throwable is only considered to be a match
      *                                 to elements of this collection if it is an exact type matches, not
-     *                                 a subclasse of an element of this collection.
+     *                                 a subclass of an element of this collection.
      */
     public IgnoringExecutionHandler(Collection<Class<? extends Throwable>> ignoredThrowableTypes,
                                     Collection<Class<? extends Throwable>> notIgnoredThrowableTypes) {
@@ -92,7 +92,7 @@ public final class IgnoringExecutionHandler
     }
 
     @Override
-    public <T> PatientExecutionResult<T> execute(Executable<T> executable,
+    public <T> PatientExecutionResult<T> execute(PatientExecutable<T> executable,
                                                  Predicate<T> filter) {
         validate().that(executable).isNotNull();
         validate().that(filter).isNotNull();

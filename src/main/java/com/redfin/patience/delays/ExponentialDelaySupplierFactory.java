@@ -14,26 +14,28 @@
  * limitations under the License.
  */
 
-package com.redfin.patience.retries;
+package com.redfin.patience.delays;
+
+import com.redfin.patience.DelaySupplierFactory;
 
 import java.time.Duration;
 import java.util.function.Supplier;
 
-import static com.redfin.validity.Validity.*;
+import static com.redfin.validity.Validity.validate;
 
 /**
- * An implementation of {@link com.redfin.patience.PatientRetryHandler} that
- * has an increasing duration to wait between each execution attempt. The duration
- * increase is exponential.
+ * An implementation of {@link DelaySupplierFactory} that creates a
+ * {@link Supplier} of {@link Duration}s that increase exponentially
+ * for each call to {@link Supplier#get()}.
  */
-public final class ExponentialDelayPatientRetryHandler
-           extends AbstractPatientRetryHandler {
+public final class ExponentialDelaySupplierFactory
+        implements DelaySupplierFactory {
 
     private final int base;
     private final Duration initialDelay;
 
     /**
-     * Create a new {@link ExponentialDelayPatientRetryHandler} instance with the
+     * Create a new {@link ExponentialDelaySupplierFactory} instance with the
      * given base and initial delay. If the base is set to one that is the same as
      * using a fixed delay retry handler with the given initial delay.
      *
@@ -46,14 +48,18 @@ public final class ExponentialDelayPatientRetryHandler
      * @throws IllegalArgumentException if initialDelay is null or if either argument is less than
      *                                  or equal to zero.
      */
-    public ExponentialDelayPatientRetryHandler(int base,
-                                               Duration initialDelay) {
-        this.base = validate().that(base).isStrictlyPositive();
-        this.initialDelay = validate().that(initialDelay).isStrictlyPositive();
+    public ExponentialDelaySupplierFactory(int base,
+                                           Duration initialDelay) {
+        this.base = validate().withMessage("Cannot use a base less than 1.")
+                              .that(base)
+                              .isAtLeast(1);
+        this.initialDelay = validate().withMessage("Cannot use a null, negative, or zero initial delay Duration.")
+                                      .that(initialDelay)
+                                      .isStrictlyPositive();
     }
 
     @Override
-    protected Supplier<Duration> getRetryHandlerDurationSupplier() {
+    public Supplier<Duration> create() {
         return new Supplier<Duration>() {
 
             private int currentCount = 0;

@@ -17,6 +17,7 @@
 package com.redfin.patience;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
@@ -45,6 +46,7 @@ interface NonInstantiableContract<T> {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Test
+    @DisplayName("is a class marked as final")
     default void testClassIsMarkedAsFinal_NonInstantiableContract() {
         // Get test class and validate precondition
         Class<T> clazz = getClassObject_NonInstantiableContract();
@@ -53,6 +55,7 @@ interface NonInstantiableContract<T> {
     }
 
     @Test
+    @DisplayName("is a class with only one constructor")
     default void testClassHasOnlyOneConstructor_NonInstantiableContract() {
         // Get test class and validate precondition
         Class<T> clazz = getClassObject_NonInstantiableContract();
@@ -63,6 +66,7 @@ interface NonInstantiableContract<T> {
     }
 
     @Test
+    @DisplayName("is a class that has a constructor that takes in no arguments")
     default void testClassHasTheZeroArgumentConstructor_NonInstantiableContract() throws NoSuchMethodException {
         // Get test class and validate precondition
         Class<T> clazz = getClassObject_NonInstantiableContract();
@@ -72,6 +76,7 @@ interface NonInstantiableContract<T> {
     }
 
     @Test
+    @DisplayName("is a class whose no argument constructor is marked as private")
     default void testClassSingleConstructorIsPrivate_NonInstantiableContract() throws NoSuchMethodException {
         // Get test class and validate precondition
         Class<T> clazz = getClassObject_NonInstantiableContract();
@@ -81,7 +86,8 @@ interface NonInstantiableContract<T> {
     }
 
     @Test
-    default void testClassThrowsAssertionErrorIfConstructorIsCalled_NonInstantiableContract() throws NoSuchMethodException {
+    @DisplayName("is a class who no argument constructor throws an AssertionError if called")
+    default void testClassThrowsAssertionErrorIfConstructorIsCalled_NonInstantiableContract() {
         // Get test class and validate precondition
         Class<T> clazz = getClassObject_NonInstantiableContract();
         // Perform actual test
@@ -96,6 +102,7 @@ interface NonInstantiableContract<T> {
     }
 
     @Test
+    @DisplayName("is a class that only has static fields")
     default void testClassOnlyHasStaticMembers_NonInstantiableContract() {
         // Get test class and validate precondition
         Class<?> clazz = getClassObject_NonInstantiableContract();
@@ -112,6 +119,7 @@ interface NonInstantiableContract<T> {
     }
 
     @Test
+    @DisplayName("is a class that only has static methods")
     default void testClassOnlyHasStaticMethods_NonInstantiableContract() {
         // Get test class and validate precondition
         Class<?> clazz = getClassObject_NonInstantiableContract();

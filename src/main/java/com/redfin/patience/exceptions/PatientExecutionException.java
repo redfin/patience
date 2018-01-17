@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package com.redfin.patience;
+package com.redfin.patience.exceptions;
+
+import com.redfin.patience.PatientExecutable;
 
 /**
  * A PatientException is an unchecked exception. It is intended
  * to signal that an unexpected Throwable was caught while executing
- * the supplied {@link Executable} or filtering the results with
+ * the supplied {@link PatientExecutable} or filtering the results with
  * the supplied {@link java.util.function.Predicate}.
  */
 public final class PatientExecutionException
            extends RuntimeException {
 
-    static final long serialVersionUID = 3L;
+    static final long serialVersionUID = 5L;
 
     /**
      * Constructs a new patience execution exception with {@code null} as its
@@ -47,6 +49,18 @@ public final class PatientExecutionException
     }
 
     /**
+     * Constructs a new patience execution with the specified cause.
+     * The message will be either null, for a null cause, or the
+     * {@link Object#toString()} method of the given cause.
+     *
+     * @param cause the cause of the exception. If {@code null} then it is the
+     *              same as calling {@link #PatientExecutionException()}.
+     */
+    public PatientExecutionException(Throwable cause) {
+        super(cause);
+    }
+
+    /**
      * Constructs a new patience execution exception with the specified detail message and
      * cause.
      *
@@ -55,18 +69,8 @@ public final class PatientExecutionException
      * @param cause   the cause of the exception. If {@code null} then it is the
      *                same as calling {@link #PatientExecutionException(String)}.
      */
-    public PatientExecutionException(String message, Throwable cause) {
+    public PatientExecutionException(String message,
+                                     Throwable cause) {
         super(message, cause);
-    }
-
-    /**
-     * Constructs a new patience execution exception with the specified cause.
-     * The message will be {@code null}.
-     *
-     * @param cause the cause of the exception. If {@code null} then it is the
-     *              same as calling {@link #PatientExecutionException()}.
-     */
-    public PatientExecutionException(Throwable cause) {
-        super(cause);
     }
 }

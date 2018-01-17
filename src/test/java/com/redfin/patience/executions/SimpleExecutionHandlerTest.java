@@ -16,8 +16,14 @@
 
 package com.redfin.patience.executions;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+@DisplayName("When a SimpleExecutionHandler")
 final class SimpleExecutionHandlerTest
- implements PatientExecutionHandlerContract<SimpleExecutionHandler> {
+    extends AbstractExecutionHandlerTest<SimpleExecutionHandler> {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Test constants, requirements, and helpers
@@ -26,5 +32,21 @@ final class SimpleExecutionHandlerTest
     @Override
     public SimpleExecutionHandler getInstance() {
         return new SimpleExecutionHandler();
+    }
+
+    @Nested
+    @DisplayName("is constructed")
+    final class ConstructorTests {
+
+        @Test
+        @DisplayName("it returns successfully")
+        void testCanInstantiate() {
+            try {
+                Assertions.assertNotNull(getInstance(),
+                                         "Should be able to create a non-null instance.");
+            } catch (Throwable thrown) {
+                Assertions.fail("Should be able to instantiate the object but caught the exception: " + thrown);
+            }
+        }
     }
 }
