@@ -16,7 +16,7 @@
 
 package com.redfin.patience.delays;
 
-import com.redfin.patience.DelaySupplierFactory;
+import com.redfin.patience.PatientDelaySupplierFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -32,15 +32,15 @@ import java.time.Duration;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-@DisplayName("When a FixedDelaySupplierFactory")
-final class FixedDelaySupplierFactoryTest {
+@DisplayName("When a FixedPatientDelaySupplierFactory")
+final class FixedPatientDelaySupplierFactoryTest {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Test constants, requirements, and helpers
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    private FixedDelaySupplierFactory getInstance(Duration duration) {
-        return new FixedDelaySupplierFactory(duration);
+    private FixedPatientDelaySupplierFactory getInstance(Duration duration) {
+        return new FixedPatientDelaySupplierFactory(duration);
     }
 
     static final class ValidArguments
@@ -100,7 +100,7 @@ final class FixedDelaySupplierFactoryTest {
         @Test
         @DisplayName("it returns separate Supplier instances for each invocation")
         void testReturnsDifferentSupplierForEachCallToGet() {
-            DelaySupplierFactory delaySupplier = getInstance(Duration.ofMillis(500));
+            PatientDelaySupplierFactory delaySupplier = getInstance(Duration.ofMillis(500));
             Assertions.assertTrue(delaySupplier.create() != delaySupplier.create(),
                                   "Separate calls to get should return different Supplier instances.");
         }

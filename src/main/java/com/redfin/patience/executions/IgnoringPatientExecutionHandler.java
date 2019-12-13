@@ -40,14 +40,14 @@ import static com.redfin.validity.Validity.validate;
  * the ignored types it will be set as the cause of a {@link PatientExecutionResult} which
  * will then be thrown.
  */
-public final class IgnoringExecutionHandler
+public final class IgnoringPatientExecutionHandler
         implements PatientExecutionHandler {
 
     private final Set<Class<? extends Throwable>> ignoredThrowableTypes;
     private final Set<Class<? extends Throwable>> notIgnoredThrowableTypes;
 
     /**
-     * Create a new {@link IgnoringExecutionHandler} with the collection of types
+     * Create a new {@link IgnoringPatientExecutionHandler} with the collection of types
      * to be ignored. If the collection of ignored is null or empty then no thrown types will be
      * ignored.
      *
@@ -55,12 +55,12 @@ public final class IgnoringExecutionHandler
      *                                 Note that Throwable is considered a match to an element of
      *                                 this collection even if it is a subclass of a type of the element.
      */
-    public IgnoringExecutionHandler(Collection<Class<? extends Throwable>> ignoredThrowableTypes) {
+    public IgnoringPatientExecutionHandler(Collection<Class<? extends Throwable>> ignoredThrowableTypes) {
         this(ignoredThrowableTypes, null);
     }
 
     /**
-     * Create a new {@link IgnoringExecutionHandler} with the collection of types
+     * Create a new {@link IgnoringPatientExecutionHandler} with the collection of types
      * to be ignored. If the collection of ignored is null or empty then no thrown types will be
      * ignored.
      *
@@ -73,8 +73,8 @@ public final class IgnoringExecutionHandler
      *                                 to elements of this collection if it is an exact type matches, not
      *                                 a subclass of an element of this collection.
      */
-    public IgnoringExecutionHandler(Collection<Class<? extends Throwable>> ignoredThrowableTypes,
-                                    Collection<Class<? extends Throwable>> notIgnoredThrowableTypes) {
+    public IgnoringPatientExecutionHandler(Collection<Class<? extends Throwable>> ignoredThrowableTypes,
+                                           Collection<Class<? extends Throwable>> notIgnoredThrowableTypes) {
         if (null == ignoredThrowableTypes) {
             this.ignoredThrowableTypes = new HashSet<>();
         } else {

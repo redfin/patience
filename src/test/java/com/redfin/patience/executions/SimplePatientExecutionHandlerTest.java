@@ -21,17 +21,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("When a SimpleExecutionHandler")
-final class SimpleExecutionHandlerTest
-    extends AbstractExecutionHandlerTest<SimpleExecutionHandler> {
+@DisplayName("When a SimplePatientExecutionHandler")
+final class SimplePatientExecutionHandlerTest
+    extends AbstractExecutionHandlerTest<SimplePatientExecutionHandler> {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Test constants, requirements, and helpers
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Override
-    public SimpleExecutionHandler getInstance() {
-        return new SimpleExecutionHandler();
+    public SimplePatientExecutionHandler getInstance() {
+        return new SimplePatientExecutionHandler();
     }
 
     @Nested

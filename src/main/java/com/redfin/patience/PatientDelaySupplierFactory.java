@@ -26,7 +26,7 @@ import java.util.function.Supplier;
  * intended that each Patient attempt to get an eventual result calls this once to get
  * the Supplier of Durations to use between unsuccessful attempts.
  */
-public interface DelaySupplierFactory {
+public interface PatientDelaySupplierFactory {
 
     /**
      * @return a new {@link Supplier} of Durations for each call. It is guaranteed

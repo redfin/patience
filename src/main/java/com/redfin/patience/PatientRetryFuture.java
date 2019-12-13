@@ -40,11 +40,11 @@ public final class PatientRetryFuture<T> {
     // Instance Fields & Methods
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    private final Sleep sleep;
+    private final PatientSleep sleep;
     private final Duration initialDelay;
     private final int defaultNumberOfRetries;
     private final PatientExecutionHandler executionHandler;
-    private final DelaySupplierFactory delaySupplierFactory;
+    private final PatientDelaySupplierFactory delaySupplierFactory;
     private final PatientExecutable<T> executable;
     private final Predicate<T> filter;
     private final Supplier<String> failureMessageSupplier;
@@ -52,7 +52,7 @@ public final class PatientRetryFuture<T> {
     /**
      * Create a new {@link PatientWaitFuture} instance with the given values.
      *
-     * @param sleep                  the {@link Sleep} to be used for making the current thread sleep.
+     * @param sleep                  the {@link PatientSleep} to be used for making the current thread sleep.
      *                               May not be null.
      * @param initialDelay           the {@link Duration} time to sleep when waiting for a value.
      *                               A value of zero means to not sleep.
@@ -63,7 +63,7 @@ public final class PatientRetryFuture<T> {
      *                               May not be negative.
      * @param executionHandler       the {@link PatientExecutionHandler} to be used for this future.
      *                               May not be null.
-     * @param delaySupplierFactory   the {@link DelaySupplierFactory} to be used to get a supplier
+     * @param delaySupplierFactory   the {@link PatientDelaySupplierFactory} to be used to get a supplier
      *                               of durations to wait between unsuccessful attempts to get a result.
      *                               May not be null.
      * @param executable             the {@link PatientExecutable} to be used to retrieve values.
@@ -77,11 +77,11 @@ public final class PatientRetryFuture<T> {
      * @throws IllegalArgumentException if any argument other than failureMessage is null or if
      *                                  either initialDelay or defaultNumberOfRetries are negative.
      */
-    public PatientRetryFuture(Sleep sleep,
+    public PatientRetryFuture(PatientSleep sleep,
                               Duration initialDelay,
                               int defaultNumberOfRetries,
                               PatientExecutionHandler executionHandler,
-                              DelaySupplierFactory delaySupplierFactory,
+                              PatientDelaySupplierFactory delaySupplierFactory,
                               PatientExecutable<T> executable,
                               Predicate<T> filter,
                               String failureMessage) {
@@ -98,7 +98,7 @@ public final class PatientRetryFuture<T> {
     /**
      * Create a new {@link PatientWaitFuture} instance with the given values.
      *
-     * @param sleep                  the {@link Sleep} to be used for making the current thread sleep.
+     * @param sleep                  the {@link PatientSleep} to be used for making the current thread sleep.
      *                               May not be null.
      * @param initialDelay           the {@link Duration} time to sleep when waiting for a value.
      *                               A value of zero means to not sleep.
@@ -109,7 +109,7 @@ public final class PatientRetryFuture<T> {
      *                               May not be negative.
      * @param executionHandler       the {@link PatientExecutionHandler} to be used for this future.
      *                               May not be null.
-     * @param delaySupplierFactory   the {@link DelaySupplierFactory} to be used to get a supplier
+     * @param delaySupplierFactory   the {@link PatientDelaySupplierFactory} to be used to get a supplier
      *                               of durations to wait between unsuccessful attempts to get a result.
      *                               May not be null.
      * @param executable             the {@link PatientExecutable} to be used to retrieve values.
@@ -122,11 +122,11 @@ public final class PatientRetryFuture<T> {
      * @throws IllegalArgumentException if any argument other than failureMessage is null or if
      *                                  either initialDelay or defaultNumberOfRetries are negative.
      */
-    public PatientRetryFuture(Sleep sleep,
+    public PatientRetryFuture(PatientSleep sleep,
                               Duration initialDelay,
                               int defaultNumberOfRetries,
                               PatientExecutionHandler executionHandler,
-                              DelaySupplierFactory delaySupplierFactory,
+                              PatientDelaySupplierFactory delaySupplierFactory,
                               PatientExecutable<T> executable,
                               Predicate<T> filter,
                               Supplier<String> failureMessageSupplier) {
@@ -333,7 +333,7 @@ public final class PatientRetryFuture<T> {
     // Package-private methods for testing
     // ----------------------------------------------------
 
-    Sleep getSleep() {
+    PatientSleep getSleep() {
         return sleep;
     }
 
@@ -349,7 +349,7 @@ public final class PatientRetryFuture<T> {
         return executionHandler;
     }
 
-    DelaySupplierFactory getDelaySupplierFactory() {
+    PatientDelaySupplierFactory getDelaySupplierFactory() {
         return delaySupplierFactory;
     }
 

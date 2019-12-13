@@ -19,6 +19,7 @@ package com.redfin.patience;
 import com.redfin.patience.exceptions.PatientInterruptedException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,14 +35,14 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@DisplayName("When Sleep.sleepFor(Duration) is called")
-final class SleepTest {
+@DisplayName("A PatientSleep implementation, when sleepFor(Duration) is called")
+final class PatientSleepTest {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Test constants, requirements, and helpers
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    private Sleep getDefaultSleep() {
+    private PatientSleep getDefaultSleep() {
         return Thread::sleep;
     }
 
@@ -75,48 +76,55 @@ final class SleepTest {
     // Test cases
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    @ParameterizedTest
-    @DisplayName("throws an exception for an invalid duration")
-    @ArgumentsSource(InvalidDurationArgumentsProvider.class)
-    void testSleepForThrowsExceptionForInvalidDuration(Duration duration) {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                                () -> getDefaultSleep().sleepFor(duration),
-                                "Should throw an exception for an invalid duration.");
-    }
+    @Nested
+    @DisplayName("when sleepFor(Duration) is called")
+    final class SleepForDurationTests {
 
-    @Test
-    @DisplayName("is a no-op for a zero duration")
-    void testSleepForCanBeCalledWithZeroDuration() throws InterruptedException {
-        Sleep sleep = mock(Sleep.class);
-        sleep.sleepFor(Duration.ZERO);
-        verify(sleep, times(0)).sleepFor(1, 0);
-    }
+        @ParameterizedTest
+        @DisplayName("throws an exception for an invalid duration")
+        @ArgumentsSource(InvalidDurationArgumentsProvider.class)
+        void testSleepForThrowsExceptionForInvalidDuration(Duration duration) {
+            Assertions.assertThrows(IllegalArgumentException.class,
+                                    () -> getDefaultSleep().sleepFor(duration),
+                                    "Should throw an exception for an invalid duration.");
+        }
 
-    @ParameterizedTest
-    @DisplayName("calls sleepFor(long, int) with the expected arguments for the given duration")
-    @ArgumentsSource(DurationAndConversionArgumentsProvider.class)
-    void testSleepForProperlyConvertsTheGivenDuration(Duration duration,
-                                                      long expectedMillis,
-                                                      int expectedNanos) throws InterruptedException {
-        Sleep sleep = spy(Sleep.class);
-        sleep.sleepFor(duration);
-        verify(sleep, times(1)).sleepFor(expectedMillis, expectedNanos);
-    }
+        @Test
+        @DisplayName("is a no-op for a zero duration")
+        void testSleepForCanBeCalledWithZeroDuration() throws InterruptedException {
+            PatientSleep sleep = mock(PatientSleep.class);
+            sleep.sleepFor(Duration.ZERO);
+            verify(sleep, times(0)).sleepFor(1, 0);
+        }
 
-    @Test
-    @DisplayName("throws an exception for overflow")
-    void testSleepForThrowsExceptionOnOverflow() {
-        Duration duration = Duration.ofSeconds(Long.MAX_VALUE);
-        Assertions.assertThrows(ArithmeticException.class,
-                                () -> getDefaultSleep().sleepFor(duration));
-    }
+        @ParameterizedTest
+        @DisplayName("calls sleepFor(long, int) with the expected arguments for the given duration")
+        @ArgumentsSource(DurationAndConversionArgumentsProvider.class)
+        void testSleepForProperlyConvertsTheGivenDuration(Duration duration,
+                                                          long expectedMillis,
+                                                          int expectedNanos) throws InterruptedException {
+            PatientSleep sleep = spy(PatientSleep.class);
+            sleep.sleepFor(duration);
+            verify(sleep, times(1)).sleepFor(expectedMillis, expectedNanos);
+        }
 
-    @Test
-    @DisplayName("throws an exception for an interruption")
-    void testSleepForThrowsForInterrupted() {
-        Sleep sleep = (millis, nanos) -> { throw new InterruptedException("expected"); };
-        Assertions.assertThrows(PatientInterruptedException.class,
-                                () -> sleep.sleepFor(Duration.ofMinutes(10)),
-                                "Should throw a PatientInterruptedException if the sleep is interrupted.");
+        @Test
+        @DisplayName("throws an exception for overflow")
+        void testSleepForThrowsExceptionOnOverflow() {
+            Duration duration = Duration.ofSeconds(Long.MAX_VALUE);
+            Assertions.assertThrows(ArithmeticException.class,
+                                    () -> getDefaultSleep().sleepFor(duration));
+        }
+
+        @Test
+        @DisplayName("throws an exception for an interruption")
+        void testSleepForThrowsForInterrupted() {
+            PatientSleep sleep = (millis, nanos) -> {
+                throw new InterruptedException("expected");
+            };
+            Assertions.assertThrows(PatientInterruptedException.class,
+                                    () -> sleep.sleepFor(Duration.ofMinutes(10)),
+                                    "Should throw a PatientInterruptedException if the sleep is interrupted.");
+        }
     }
 }

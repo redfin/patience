@@ -16,10 +16,10 @@
 
 package com.redfin.patience;
 
-import com.redfin.patience.delays.FixedDelaySupplierFactory;
+import com.redfin.patience.delays.FixedPatientDelaySupplierFactory;
 import com.redfin.patience.exceptions.PatientException;
 import com.redfin.patience.exceptions.PatientTimeoutException;
-import com.redfin.patience.executions.SimpleExecutionHandler;
+import com.redfin.patience.executions.SimplePatientExecutionHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -57,18 +57,18 @@ final class PatientWaitFutureTest {
         return getInstance(Thread::sleep,
                            Duration.ZERO,
                            Duration.ZERO,
-                           new SimpleExecutionHandler(),
-                           new FixedDelaySupplierFactory(Duration.ZERO),
+                           new SimplePatientExecutionHandler(),
+                           new FixedPatientDelaySupplierFactory(Duration.ZERO),
                            () -> true,
                            bool -> null != bool && bool,
                            message);
     }
 
-    private PatientWaitFuture<Boolean> getInstance(Sleep sleep,
+    private PatientWaitFuture<Boolean> getInstance(PatientSleep sleep,
                                                    Duration initialDelay,
                                                    Duration defaultTimeout,
                                                    PatientExecutionHandler executionHandler,
-                                                   DelaySupplierFactory delaySupplierFactory,
+                                                   PatientDelaySupplierFactory delaySupplierFactory,
                                                    PatientExecutable<Boolean> executable,
                                                    Predicate<Boolean> filter,
                                                    String failureMessage) {
@@ -82,11 +82,11 @@ final class PatientWaitFutureTest {
                                        failureMessage);
     }
 
-    private PatientWaitFuture<Boolean> getInstance(Sleep sleep,
+    private PatientWaitFuture<Boolean> getInstance(PatientSleep sleep,
                                                    Duration initialDelay,
                                                    Duration defaultTimeout,
                                                    PatientExecutionHandler executionHandler,
-                                                   DelaySupplierFactory delaySupplierFactory,
+                                                   PatientDelaySupplierFactory delaySupplierFactory,
                                                    PatientExecutable<Boolean> executable,
                                                    Predicate<Boolean> filter,
                                                    Supplier<String> failureMessageSupplier) {
@@ -105,9 +105,9 @@ final class PatientWaitFutureTest {
 
         @Override
         public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
-            Sleep sleep = Thread::sleep;
-            PatientExecutionHandler executionHandler = new SimpleExecutionHandler();
-            DelaySupplierFactory delaySupplierFactory = new FixedDelaySupplierFactory(Duration.ZERO);
+            PatientSleep sleep = Thread::sleep;
+            PatientExecutionHandler executionHandler = new SimplePatientExecutionHandler();
+            PatientDelaySupplierFactory delaySupplierFactory = new FixedPatientDelaySupplierFactory(Duration.ZERO);
             PatientExecutable<Boolean> executable = () -> true;
             Predicate<Boolean> filter = bool -> null != bool && bool;
             Supplier<String> messageSupplier = () -> "hello";
@@ -123,9 +123,9 @@ final class PatientWaitFutureTest {
 
         @Override
         public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
-            Sleep sleep = Thread::sleep;
-            PatientExecutionHandler executionHandler = new SimpleExecutionHandler();
-            DelaySupplierFactory delaySupplierFactory = new FixedDelaySupplierFactory(Duration.ZERO);
+            PatientSleep sleep = Thread::sleep;
+            PatientExecutionHandler executionHandler = new SimplePatientExecutionHandler();
+            PatientDelaySupplierFactory delaySupplierFactory = new FixedPatientDelaySupplierFactory(Duration.ZERO);
             PatientExecutable<Boolean> executable = () -> true;
             Predicate<Boolean> filter = bool -> null != bool && bool;
             Supplier<String> messageSupplier = () -> "hello";
@@ -153,11 +153,11 @@ final class PatientWaitFutureTest {
         @ParameterizedTest
         @DisplayName("it returns successfully with valid arguments")
         @ArgumentsSource(ValidArgumentsProvider.class)
-        void testValidArgumentsSucceed(Sleep sleep,
+        void testValidArgumentsSucceed(PatientSleep sleep,
                                        Duration initialDelay,
                                        Duration defaultTimeout,
                                        PatientExecutionHandler executionHandler,
-                                       DelaySupplierFactory delaySupplierFactory,
+                                       PatientDelaySupplierFactory delaySupplierFactory,
                                        PatientExecutable<Boolean> executable,
                                        Predicate<Boolean> filter,
                                        Supplier<String> messageSupplier) {
@@ -179,11 +179,11 @@ final class PatientWaitFutureTest {
         @ParameterizedTest
         @DisplayName("it returns successfully with valid arguments and a null message")
         @ArgumentsSource(ValidArgumentsProvider.class)
-        void testSucceedsWithNullMessage(Sleep sleep,
+        void testSucceedsWithNullMessage(PatientSleep sleep,
                                          Duration initialDelay,
                                          Duration defaultTimeout,
                                          PatientExecutionHandler executionHandler,
-                                         DelaySupplierFactory delaySupplierFactory,
+                                         PatientDelaySupplierFactory delaySupplierFactory,
                                          PatientExecutable<Boolean> executable,
                                          Predicate<Boolean> filter) {
             try {
@@ -204,11 +204,11 @@ final class PatientWaitFutureTest {
         @ParameterizedTest
         @DisplayName("it throws an exception for invalid arguments")
         @ArgumentsSource(InvalidArgumentsProvider.class)
-        void testInvalidArgumentsThrowsException(Sleep sleep,
+        void testInvalidArgumentsThrowsException(PatientSleep sleep,
                                                  Duration initialDelay,
                                                  Duration defaultTimeout,
                                                  PatientExecutionHandler executionHandler,
-                                                 DelaySupplierFactory delaySupplierFactory,
+                                                 PatientDelaySupplierFactory delaySupplierFactory,
                                                  PatientExecutable<Boolean> executable,
                                                  Predicate<Boolean> filter,
                                                  Supplier<String> messageSupplier) {
@@ -232,10 +232,10 @@ final class PatientWaitFutureTest {
         @Test
         @DisplayName("it returns the given values")
         void testReturnsGivenValues() {
-            Sleep sleep = Thread::sleep;
+            PatientSleep sleep = Thread::sleep;
             Duration duration = Duration.ZERO;
-            PatientExecutionHandler executionHandler = new SimpleExecutionHandler();
-            DelaySupplierFactory delaySupplierFactory = new FixedDelaySupplierFactory(duration);
+            PatientExecutionHandler executionHandler = new SimplePatientExecutionHandler();
+            PatientDelaySupplierFactory delaySupplierFactory = new FixedPatientDelaySupplierFactory(duration);
             PatientExecutable<Boolean> executable = () -> true;
             Predicate<Boolean> filter = bool -> null != bool && bool;
             Supplier<String> failureMessageSupplier = () -> "hello";
@@ -327,8 +327,8 @@ final class PatientWaitFutureTest {
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
-                                                            new FixedDelaySupplierFactory(Duration.ZERO),
+                                                            new SimplePatientExecutionHandler(),
+                                                            new FixedPatientDelaySupplierFactory(Duration.ZERO),
                                                             () -> true,
                                                             bool -> null != bool && bool,
                                                             "whoops");
@@ -343,8 +343,8 @@ final class PatientWaitFutureTest {
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
-                                                            new FixedDelaySupplierFactory(Duration.ZERO),
+                                                            new SimplePatientExecutionHandler(),
+                                                            new FixedPatientDelaySupplierFactory(Duration.ZERO),
                                                             () -> false,
                                                             bool -> null != bool && bool,
                                                             "whoops");
@@ -356,11 +356,11 @@ final class PatientWaitFutureTest {
         @Test
         @DisplayName("it throws an exception if the delay supplier returns a null duration")
         void testGetThrowsAnExceptionIfDelaySupplierReturnsNull() {
-            DelaySupplierFactory supplierFactory = () -> () -> null;
+            PatientDelaySupplierFactory supplierFactory = () -> () -> null;
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
+                                                            new SimplePatientExecutionHandler(),
                                                             supplierFactory,
                                                             () -> false,
                                                             bool -> null != bool && bool,
@@ -373,11 +373,11 @@ final class PatientWaitFutureTest {
         @Test
         @DisplayName("it throws an exception if the delay supplier returns a negative duration")
         void testGetThrowsAnExceptionIfDelaySupplierReturnsNegative() {
-            DelaySupplierFactory supplierFactory = () -> () -> Duration.ofMillis(-500);
+            PatientDelaySupplierFactory supplierFactory = () -> () -> Duration.ofMillis(-500);
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
+                                                            new SimplePatientExecutionHandler(),
                                                             supplierFactory,
                                                             () -> false,
                                                             bool -> null != bool && bool,
@@ -396,8 +396,8 @@ final class PatientWaitFutureTest {
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
-                                                            new FixedDelaySupplierFactory(Duration.ZERO),
+                                                            new SimplePatientExecutionHandler(),
+                                                            new FixedPatientDelaySupplierFactory(Duration.ZERO),
                                                             executable,
                                                             bool -> null != bool && bool,
                                                             "whoops");
@@ -418,8 +418,8 @@ final class PatientWaitFutureTest {
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
-                                                            new FixedDelaySupplierFactory(Duration.ZERO),
+                                                            new SimplePatientExecutionHandler(),
+                                                            new FixedPatientDelaySupplierFactory(Duration.ZERO),
                                                             executable,
                                                             bool -> null != bool && bool,
                                                             "whoops");
@@ -438,8 +438,8 @@ final class PatientWaitFutureTest {
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
-                                                            new FixedDelaySupplierFactory(Duration.ZERO),
+                                                            new SimplePatientExecutionHandler(),
+                                                            new FixedPatientDelaySupplierFactory(Duration.ZERO),
                                                             executable,
                                                             bool -> null != bool && bool,
                                                             "whoops");
@@ -455,7 +455,7 @@ final class PatientWaitFutureTest {
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
+                                                            new SimplePatientExecutionHandler(),
                                                             () -> null,
                                                             () -> false,
                                                             bool -> null != bool && bool,
@@ -478,7 +478,7 @@ final class PatientWaitFutureTest {
                                                             Duration.ZERO,
                                                             Duration.ZERO,
                                                             handler,
-                                                            new FixedDelaySupplierFactory(Duration.ZERO),
+                                                            new FixedPatientDelaySupplierFactory(Duration.ZERO),
                                                             () -> false,
                                                             bool -> null != bool && bool,
                                                             "whoops");
@@ -493,8 +493,8 @@ final class PatientWaitFutureTest {
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
-                                                            new FixedDelaySupplierFactory(Duration.ZERO),
+                                                            new SimplePatientExecutionHandler(),
+                                                            new FixedPatientDelaySupplierFactory(Duration.ZERO),
                                                             () -> { throw new RuntimeException("whoops"); },
                                                             bool -> null != bool && bool,
                                                             "whoops");
@@ -530,8 +530,8 @@ final class PatientWaitFutureTest {
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
-                                                            new FixedDelaySupplierFactory(Duration.ZERO),
+                                                            new SimplePatientExecutionHandler(),
+                                                            new FixedPatientDelaySupplierFactory(Duration.ZERO),
                                                             () -> true,
                                                             bool -> null != bool && bool,
                                                             "whoops");
@@ -545,8 +545,8 @@ final class PatientWaitFutureTest {
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
-                                                            new FixedDelaySupplierFactory(Duration.ZERO),
+                                                            new SimplePatientExecutionHandler(),
+                                                            new FixedPatientDelaySupplierFactory(Duration.ZERO),
                                                             () -> false,
                                                             bool -> null != bool && bool,
                                                             "whoops");
@@ -557,11 +557,11 @@ final class PatientWaitFutureTest {
         @Test
         @DisplayName("it throws an exception if the delay supplier returns a null duration")
         void testCheckThrowsAnExceptionIfDelaySupplierReturnsNull() {
-            DelaySupplierFactory supplierFactory = () -> () -> null;
+            PatientDelaySupplierFactory supplierFactory = () -> () -> null;
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
+                                                            new SimplePatientExecutionHandler(),
                                                             supplierFactory,
                                                             () -> false,
                                                             bool -> null != bool && bool,
@@ -574,11 +574,11 @@ final class PatientWaitFutureTest {
         @Test
         @DisplayName("it throws an exception if the delay supplier returns a negative duration")
         void testCheckThrowsAnExceptionIfDelaySupplierReturnsNegative() {
-            DelaySupplierFactory supplierFactory = () -> () -> Duration.ofMillis(-500);
+            PatientDelaySupplierFactory supplierFactory = () -> () -> Duration.ofMillis(-500);
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
+                                                            new SimplePatientExecutionHandler(),
                                                             supplierFactory,
                                                             () -> false,
                                                             bool -> null != bool && bool,
@@ -597,8 +597,8 @@ final class PatientWaitFutureTest {
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
-                                                            new FixedDelaySupplierFactory(Duration.ZERO),
+                                                            new SimplePatientExecutionHandler(),
+                                                            new FixedPatientDelaySupplierFactory(Duration.ZERO),
                                                             executable,
                                                             bool -> null != bool && bool,
                                                             "whoops");
@@ -618,8 +618,8 @@ final class PatientWaitFutureTest {
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
-                                                            new FixedDelaySupplierFactory(Duration.ZERO),
+                                                            new SimplePatientExecutionHandler(),
+                                                            new FixedPatientDelaySupplierFactory(Duration.ZERO),
                                                             executable,
                                                             bool -> null != bool && bool,
                                                             "whoops");
@@ -637,8 +637,8 @@ final class PatientWaitFutureTest {
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
-                                                            new FixedDelaySupplierFactory(Duration.ZERO),
+                                                            new SimplePatientExecutionHandler(),
+                                                            new FixedPatientDelaySupplierFactory(Duration.ZERO),
                                                             executable,
                                                             bool -> null != bool && bool,
                                                             "whoops");
@@ -654,7 +654,7 @@ final class PatientWaitFutureTest {
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
+                                                            new SimplePatientExecutionHandler(),
                                                             () -> null,
                                                             () -> false,
                                                             bool -> null != bool && bool,
@@ -677,7 +677,7 @@ final class PatientWaitFutureTest {
                                                             Duration.ZERO,
                                                             Duration.ZERO,
                                                             handler,
-                                                            new FixedDelaySupplierFactory(Duration.ZERO),
+                                                            new FixedPatientDelaySupplierFactory(Duration.ZERO),
                                                             () -> false,
                                                             bool -> null != bool && bool,
                                                             "whoops");
@@ -692,8 +692,8 @@ final class PatientWaitFutureTest {
             PatientWaitFuture<Boolean> future = getInstance(Thread::sleep,
                                                             Duration.ZERO,
                                                             Duration.ZERO,
-                                                            new SimpleExecutionHandler(),
-                                                            new FixedDelaySupplierFactory(Duration.ZERO),
+                                                            new SimplePatientExecutionHandler(),
+                                                            new FixedPatientDelaySupplierFactory(Duration.ZERO),
                                                             () -> { throw new RuntimeException("whoops"); },
                                                             bool -> null != bool && bool,
                                                             "whoops");

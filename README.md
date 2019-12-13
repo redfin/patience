@@ -24,7 +24,7 @@ Desired behavior:
 <dependency>
     <groupId>com.redfin</groupId>
     <artifactId>patience</artifactId>
-    <version>4.0.0</version>
+    <version>5.0.0</version>
 </dependency>
 ```
 

@@ -16,7 +16,7 @@
 
 package com.redfin.patience.delays;
 
-import com.redfin.patience.DelaySupplierFactory;
+import com.redfin.patience.PatientDelaySupplierFactory;
 
 import java.time.Duration;
 import java.util.function.Supplier;
@@ -24,17 +24,17 @@ import java.util.function.Supplier;
 import static com.redfin.validity.Validity.validate;
 
 /**
- * An implementation of {@link DelaySupplierFactory} that creates a
+ * An implementation of {@link PatientDelaySupplierFactory} that creates a
  * {@link Supplier} of {@link Duration}s that return a fixed
  * {@link Duration} for each call to {@link Supplier#get()}.
  */
-public final class FixedDelaySupplierFactory
-        implements DelaySupplierFactory {
+public final class FixedPatientDelaySupplierFactory
+        implements PatientDelaySupplierFactory {
 
     private final Duration duration;
 
     /**
-     * Create a new {@link FixedDelaySupplierFactory} instance with the given
+     * Create a new {@link FixedPatientDelaySupplierFactory} instance with the given
      * duration to wait between execution attempts. A duration of zero means that
      * no time should be taken between attempts.
      *
@@ -43,7 +43,7 @@ public final class FixedDelaySupplierFactory
      *
      * @throws IllegalArgumentException if delayDuration is null or negative.
      */
-    public FixedDelaySupplierFactory(Duration delayDuration) {
+    public FixedPatientDelaySupplierFactory(Duration delayDuration) {
         this.duration = validate().withMessage("Cannot use a null or negative delayDuration.")
                                   .that(delayDuration)
                                   .isGreaterThanOrEqualToZero();

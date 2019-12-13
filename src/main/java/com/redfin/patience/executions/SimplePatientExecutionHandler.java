@@ -32,7 +32,7 @@ import static com.redfin.validity.Validity.validate;
  * thrown from the executable or the predicate will set as the cause of a thrown
  * {@link PatientExecutionException}.
  */
-public final class SimpleExecutionHandler
+public final class SimplePatientExecutionHandler
         implements PatientExecutionHandler {
 
     @Override

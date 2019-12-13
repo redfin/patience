@@ -16,7 +16,7 @@
 
 package com.redfin.patience.delays;
 
-import com.redfin.patience.DelaySupplierFactory;
+import com.redfin.patience.PatientDelaySupplierFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DisplayName;
@@ -35,16 +35,16 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-@DisplayName("When an ExponentialDelaySupplierFactory")
-final class ExponentialDelaySupplierFactoryTest {
+@DisplayName("When an ExponentialPatientDelaySupplierFactory")
+final class ExponentialPatientDelaySupplierFactoryTest {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Test constants, requirements, and helpers
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    private ExponentialDelaySupplierFactory getInstance(int base,
-                                                        Duration initialDelay) {
-        return new ExponentialDelaySupplierFactory(base, initialDelay);
+    private ExponentialPatientDelaySupplierFactory getInstance(int base,
+                                                               Duration initialDelay) {
+        return new ExponentialPatientDelaySupplierFactory(base, initialDelay);
     }
 
     static final class ValidArguments
@@ -119,7 +119,7 @@ final class ExponentialDelaySupplierFactoryTest {
         @Test
         @DisplayName("it returns separate Supplier instances for each invocation")
         void testReturnsDifferentSupplierForEachCallToGet() {
-            DelaySupplierFactory delaySupplier = getInstance(2, Duration.ofMillis(500));
+            PatientDelaySupplierFactory delaySupplier = getInstance(2, Duration.ofMillis(500));
             Assertions.assertTrue(delaySupplier.create() != delaySupplier.create(),
                                   "Separate calls to get should return different Supplier instances.");
         }

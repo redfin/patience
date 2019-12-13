@@ -16,16 +16,16 @@
 
 package com.redfin.patience;
 
-import com.redfin.patience.delays.ExponentialDelaySupplierFactory;
-import com.redfin.patience.delays.FixedDelaySupplierFactory;
+import com.redfin.patience.delays.ExponentialPatientDelaySupplierFactory;
+import com.redfin.patience.delays.FixedPatientDelaySupplierFactory;
 
 import java.time.Duration;
 
 /**
  * A static, non-instantiable, class for obtaining instances of different
- * implementations of the {@link DelaySupplierFactory} interface.
+ * implementations of the {@link PatientDelaySupplierFactory} interface.
  */
-public final class DelaySuppliers {
+public final class PatientDelaySuppliers {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Instance Methods
@@ -35,7 +35,7 @@ public final class DelaySuppliers {
      * Make sure that the static class cannot be instantiated
      */
 
-    private DelaySuppliers() {
+    private PatientDelaySuppliers() {
         throw new AssertionError("No instances for you!");
     }
 
@@ -46,22 +46,22 @@ public final class DelaySuppliers {
     /**
      * @param delayDuration the {@link Duration} to be returned for each call
      *                      to {@link java.util.function.Supplier#get} from the
-     *                      suppliers returned by {@link DelaySupplierFactory#create}.
+     *                      suppliers returned by {@link PatientDelaySupplierFactory#create}.
      *                      May not be null or negative.
      *
-     * @return a new {@link FixedDelaySupplierFactory} with the given
+     * @return a new {@link FixedPatientDelaySupplierFactory} with the given
      * delay duration.
      *
      * @throws IllegalArgumentException if delayDuration is null or negative.
      */
-    public static DelaySupplierFactory fixed(Duration delayDuration) {
-        return new FixedDelaySupplierFactory(delayDuration);
+    public static PatientDelaySupplierFactory fixed(Duration delayDuration) {
+        return new FixedPatientDelaySupplierFactory(delayDuration);
     }
 
     /**
      * @param base         the int base for the exponential increase of {@link Duration}s returned
      *                     by the given {@link java.util.function.Supplier} returned by the delay
-     *                     supplier. A base of 1 is the same as using a {@link FixedDelaySupplierFactory} with
+     *                     supplier. A base of 1 is the same as using a {@link FixedPatientDelaySupplierFactory} with
      *                     the given initialDelay as the duration.
      *                     May not be less than 1.
      * @param initialDelay the {@link Duration} to be returned by the first call to
@@ -70,14 +70,14 @@ public final class DelaySuppliers {
      *                     base for each subsequent call.
      *                     May not be null, zero, or negative.
      *
-     * @return a new {@link ExponentialDelaySupplierFactory} with the given
+     * @return a new {@link ExponentialPatientDelaySupplierFactory} with the given
      * initial duration and base.
      *
      * @throws IllegalArgumentException if base is less than 1 or if
      *                                  delayDuration is null, negative, or zero.
      */
-    public static DelaySupplierFactory exponential(int base,
-                                                   Duration initialDelay) {
-        return new ExponentialDelaySupplierFactory(base, initialDelay);
+    public static PatientDelaySupplierFactory exponential(int base,
+                                                          Duration initialDelay) {
+        return new ExponentialPatientDelaySupplierFactory(base, initialDelay);
     }
 }

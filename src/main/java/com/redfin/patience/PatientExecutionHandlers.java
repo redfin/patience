@@ -16,8 +16,8 @@
 
 package com.redfin.patience;
 
-import com.redfin.patience.executions.IgnoringExecutionHandler;
-import com.redfin.patience.executions.SimpleExecutionHandler;
+import com.redfin.patience.executions.IgnoringPatientExecutionHandler;
+import com.redfin.patience.executions.SimplePatientExecutionHandler;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -52,10 +52,10 @@ public final class PatientExecutionHandlers {
     }
 
     /**
-     * @return a new {@link SimpleExecutionHandler} instance.
+     * @return a new {@link SimplePatientExecutionHandler} instance.
      */
     public static PatientExecutionHandler simple() {
-        return new SimpleExecutionHandler();
+        return new SimplePatientExecutionHandler();
     }
 
     /**
@@ -63,9 +63,9 @@ public final class PatientExecutionHandlers {
      *                              A null or empty array will return an execution handler that
      *                              doesn't ignore any throwable that is thrown. Note that {@link OutOfMemoryError}s are
      *                              explicitly NOT ignored even if added to the argument array. If you want to ignore
-     *                              them, then you need to create an {@link IgnoringExecutionHandler} directly.
+     *                              them, then you need to create an {@link IgnoringPatientExecutionHandler} directly.
      *
-     * @return a new {@link IgnoringExecutionHandler} instance that ignores the given types.
+     * @return a new {@link IgnoringPatientExecutionHandler} instance that ignores the given types.
      */
     @SafeVarargs
     public static PatientExecutionHandler ignoring(Class<? extends Throwable>... ignoredThrowableTypes) {
@@ -77,16 +77,16 @@ public final class PatientExecutionHandlers {
      *                              A null or empty collection will return an execution handler that
      *                              doesn't ignore any throwable that is thrown. Note that {@link OutOfMemoryError}s are
      *                              explicitly NOT ignored even if added to the argument array. If you want to ignore
-     *                              them, then you need to create an {@link IgnoringExecutionHandler} directly.
+     *                              them, then you need to create an {@link IgnoringPatientExecutionHandler} directly.
      *
-     * @return a new {@link IgnoringExecutionHandler} instance that ignores the given types.
+     * @return a new {@link IgnoringPatientExecutionHandler} instance that ignores the given types.
      */
     public static PatientExecutionHandler ignoring(Collection<Class<? extends Throwable>> ignoredThrowableTypes) {
-        return new IgnoringExecutionHandler(ignoredThrowableTypes, NOT_IGNORED_CLASSES);
+        return new IgnoringPatientExecutionHandler(ignoredThrowableTypes, NOT_IGNORED_CLASSES);
     }
 
     /**
-     * @return a new {@link IgnoringExecutionHandler} instance that ignores all
+     * @return a new {@link IgnoringPatientExecutionHandler} instance that ignores all
      * Exception types, though not Errors.
      */
     public static PatientExecutionHandler ignoringAll() {

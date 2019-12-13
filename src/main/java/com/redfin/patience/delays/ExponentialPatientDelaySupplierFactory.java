@@ -16,7 +16,7 @@
 
 package com.redfin.patience.delays;
 
-import com.redfin.patience.DelaySupplierFactory;
+import com.redfin.patience.PatientDelaySupplierFactory;
 
 import java.time.Duration;
 import java.util.function.Supplier;
@@ -24,18 +24,18 @@ import java.util.function.Supplier;
 import static com.redfin.validity.Validity.validate;
 
 /**
- * An implementation of {@link DelaySupplierFactory} that creates a
+ * An implementation of {@link PatientDelaySupplierFactory} that creates a
  * {@link Supplier} of {@link Duration}s that increase exponentially
  * for each call to {@link Supplier#get()}.
  */
-public final class ExponentialDelaySupplierFactory
-        implements DelaySupplierFactory {
+public final class ExponentialPatientDelaySupplierFactory
+        implements PatientDelaySupplierFactory {
 
     private final int base;
     private final Duration initialDelay;
 
     /**
-     * Create a new {@link ExponentialDelaySupplierFactory} instance with the
+     * Create a new {@link ExponentialPatientDelaySupplierFactory} instance with the
      * given base and initial delay. If the base is set to one that is the same as
      * using a fixed delay retry handler with the given initial delay.
      *
@@ -48,8 +48,8 @@ public final class ExponentialDelaySupplierFactory
      * @throws IllegalArgumentException if initialDelay is null or if either argument is less than
      *                                  or equal to zero.
      */
-    public ExponentialDelaySupplierFactory(int base,
-                                           Duration initialDelay) {
+    public ExponentialPatientDelaySupplierFactory(int base,
+                                                  Duration initialDelay) {
         this.base = validate().withMessage("Cannot use a base less than 1.")
                               .that(base)
                               .isAtLeast(1);

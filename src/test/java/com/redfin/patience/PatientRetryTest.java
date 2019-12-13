@@ -16,8 +16,8 @@
 
 package com.redfin.patience;
 
-import com.redfin.patience.delays.FixedDelaySupplierFactory;
-import com.redfin.patience.executions.SimpleExecutionHandler;
+import com.redfin.patience.delays.FixedPatientDelaySupplierFactory;
+import com.redfin.patience.executions.SimplePatientExecutionHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -38,12 +38,12 @@ public class PatientRetryTest {
     // Test constants, requirements, and helpers
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    private static final Sleep SLEEP;
+    private static final PatientSleep SLEEP;
     private static final Duration POSITIVE_DURATION;
     private static final Duration NEGATIVE_DURATION;
     private static final int NUMBER_OF_RETRIES;
     private static final PatientExecutionHandler EXECUTION_HANDLER;
-    private static final DelaySupplierFactory DELAY_SUPPLIER_FACTORY;
+    private static final PatientDelaySupplierFactory DELAY_SUPPLIER_FACTORY;
 
     static {
         SLEEP = Thread::sleep;
@@ -51,18 +51,18 @@ public class PatientRetryTest {
         NEGATIVE_DURATION = Duration.ofMillis(-500);
         NUMBER_OF_RETRIES = 0;
         EXECUTION_HANDLER = PatientExecutionHandlers.simple();
-        DELAY_SUPPLIER_FACTORY = new FixedDelaySupplierFactory(Duration.ofMillis(500));
+        DELAY_SUPPLIER_FACTORY = new FixedPatientDelaySupplierFactory(Duration.ofMillis(500));
     }
 
     private PatientRetry getInstance() {
         return getInstance(SLEEP, POSITIVE_DURATION, NUMBER_OF_RETRIES, EXECUTION_HANDLER, DELAY_SUPPLIER_FACTORY);
     }
 
-    private PatientRetry getInstance(Sleep sleep,
+    private PatientRetry getInstance(PatientSleep sleep,
                                      Duration initialDelay,
                                      int defaultNumberOfRetries,
                                      PatientExecutionHandler executionHandler,
-                                     DelaySupplierFactory delaySupplierFactory) {
+                                     PatientDelaySupplierFactory delaySupplierFactory) {
         return new PatientRetry(sleep,
                                 initialDelay,
                                 defaultNumberOfRetries,
@@ -113,11 +113,11 @@ public class PatientRetryTest {
         @ParameterizedTest
         @DisplayName("it returns a non-null instance successfully for valid arguments")
         @ArgumentsSource(ValidArgumentsProvider.class)
-        void testCanInstantiateWithValidArguments(Sleep sleep,
+        void testCanInstantiateWithValidArguments(PatientSleep sleep,
                                                   Duration initialDelay,
                                                   int defaultNumberOfRetries,
                                                   PatientExecutionHandler handler,
-                                                  DelaySupplierFactory delaySupplierFactory) {
+                                                  PatientDelaySupplierFactory delaySupplierFactory) {
             try {
                 Assertions.assertNotNull(getInstance(sleep, initialDelay, defaultNumberOfRetries, handler, delaySupplierFactory),
                                          "Should have received a non-null instance with valid arguments.");
@@ -129,11 +129,11 @@ public class PatientRetryTest {
         @ParameterizedTest
         @DisplayName("it throws an exception for invalid arguments")
         @ArgumentsSource(PatientRetryTest.InvalidArgumentsProvider.class)
-        void testThrowsExceptionWithInvalidArguments(Sleep sleep,
+        void testThrowsExceptionWithInvalidArguments(PatientSleep sleep,
                                                      Duration initialDelay,
                                                      int defaultNumberOfRetries,
                                                      PatientExecutionHandler handler,
-                                                     DelaySupplierFactory delaySupplierFactory) {
+                                                     PatientDelaySupplierFactory delaySupplierFactory) {
             Assertions.assertThrows(IllegalArgumentException.class,
                                     () -> getInstance(sleep, initialDelay, defaultNumberOfRetries, handler, delaySupplierFactory),
                                     "Should have thrown an exception when the constructor is called with an invalid argument.");
@@ -147,11 +147,11 @@ public class PatientRetryTest {
         @ParameterizedTest
         @DisplayName("it returns the given arguments")
         @ArgumentsSource(PatientRetryTest.ValidArgumentsProvider.class)
-        void testCanInstantiateWithValidArguments(Sleep sleep,
+        void testCanInstantiateWithValidArguments(PatientSleep sleep,
                                                   Duration initialDelay,
                                                   int defaultNumberOfRetries,
                                                   PatientExecutionHandler handler,
-                                                  DelaySupplierFactory delaySupplierFactory) {
+                                                  PatientDelaySupplierFactory delaySupplierFactory) {
             PatientRetry retry = getInstance(sleep, initialDelay, defaultNumberOfRetries, handler, delaySupplierFactory);
             Assertions.assertAll(() -> Assertions.assertEquals(sleep, retry.getSleep(), "Should return the given sleep"),
                                  () -> Assertions.assertEquals(initialDelay, retry.getInitialDelay(), "Should return the given initial delay"),
@@ -309,8 +309,8 @@ public class PatientRetryTest {
             PatientRetry wait = PatientRetry.builder().build();
             Assertions.assertAll(() -> Assertions.assertEquals(Duration.ZERO, wait.getInitialDelay(), "Should have the default initial delay"),
                                  () -> Assertions.assertEquals(0, wait.getDefaultNumberOfRetries(), "Should have the expected default number of retries"),
-                                 () -> Assertions.assertTrue(wait.getExecutionHandler() instanceof SimpleExecutionHandler, "Should have the default execution handler"),
-                                 () -> Assertions.assertTrue(wait.getDelaySupplierFactory() instanceof FixedDelaySupplierFactory, "Should have the default type of delay supplier factory"),
+                                 () -> Assertions.assertTrue(wait.getExecutionHandler() instanceof SimplePatientExecutionHandler, "Should have the default execution handler"),
+                                 () -> Assertions.assertTrue(wait.getDelaySupplierFactory() instanceof FixedPatientDelaySupplierFactory, "Should have the default type of delay supplier factory"),
                                  () -> Assertions.assertEquals(Duration.ZERO, wait.getDelaySupplierFactory().create().get(), "The delay supplier factory should return the default wait time"));
         }
     }

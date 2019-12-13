@@ -32,17 +32,17 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-@DisplayName("DelaySuppliers")
-final class DelaySuppliersTest
- implements NonInstantiableContract<DelaySuppliers> {
+@DisplayName("PatientDelaySuppliers")
+final class PatientDelaySuppliersTest
+ implements NonInstantiableContract<PatientDelaySuppliers> {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Test constants, requirements, and helpers
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Override
-    public Class<DelaySuppliers> getClassObject_NonInstantiableContract() {
-        return DelaySuppliers.class;
+    public Class<PatientDelaySuppliers> getClassObject_NonInstantiableContract() {
+        return PatientDelaySuppliers.class;
     }
 
     private static final class ValidFixedArgumentsProvider
@@ -108,7 +108,7 @@ final class DelaySuppliersTest
         @ArgumentsSource(InvalidFixedArgumentsProvider.class)
         void testThrowsWithInvalidArguments(Duration duration) {
             Assertions.assertThrows(IllegalArgumentException.class,
-                                    () -> DelaySuppliers.fixed(duration),
+                                    () -> PatientDelaySuppliers.fixed(duration),
                                     "Should throw an exception for an invalid argument.");
         }
 
@@ -116,7 +116,7 @@ final class DelaySuppliersTest
         @DisplayName("it returns a non-null delay supplier for a valid argument")
         @ArgumentsSource(ValidFixedArgumentsProvider.class)
         void testReturnsSuccessfullyWithValidArguments(Duration duration) {
-            Assertions.assertNotNull(DelaySuppliers.fixed(duration),
+            Assertions.assertNotNull(PatientDelaySuppliers.fixed(duration),
                                      "Should return a non-null delay supplier for a valid argument.");
         }
 
@@ -127,7 +127,7 @@ final class DelaySuppliersTest
                                               List<Duration> expectedSuppliedDurations) {
             Assumptions.assumeTrue(null != expectedSuppliedDurations && !expectedSuppliedDurations.isEmpty(),
                                    "Should have received a non-null and non-empty list of expected durations.");
-            Supplier<Duration> supplier = DelaySuppliers.fixed(duration).create();
+            Supplier<Duration> supplier = PatientDelaySuppliers.fixed(duration).create();
             Assertions.assertAll(expectedSuppliedDurations.stream().map(next -> () -> Assertions.assertEquals(next, supplier.get())));
         }
     }
@@ -142,7 +142,7 @@ final class DelaySuppliersTest
         void testThrowsWithInvalidArguments(int base,
                                             Duration duration) {
             Assertions.assertThrows(IllegalArgumentException.class,
-                                    () -> DelaySuppliers.exponential(base, duration),
+                                    () -> PatientDelaySuppliers.exponential(base, duration),
                                     "Should throw an exception for an invalid argument.");
         }
 
@@ -151,7 +151,7 @@ final class DelaySuppliersTest
         @ArgumentsSource(ValidExponentialArgumentsProvider.class)
         void testReturnsSuccessfullyWithValidArguments(int base,
                                                        Duration duration) {
-            Assertions.assertNotNull(DelaySuppliers.exponential(base, duration),
+            Assertions.assertNotNull(PatientDelaySuppliers.exponential(base, duration),
                                      "Should return a non-null delay supplier for a valid argument.");
         }
 
@@ -163,7 +163,7 @@ final class DelaySuppliersTest
                                               List<Duration> expectedSuppliedDurations) {
             Assumptions.assumeTrue(null != expectedSuppliedDurations && !expectedSuppliedDurations.isEmpty(),
                                    "Should have received a non-null and non-empty list of expected durations.");
-            Supplier<Duration> supplier = DelaySuppliers.exponential(base, duration).create();
+            Supplier<Duration> supplier = PatientDelaySuppliers.exponential(base, duration).create();
             Assertions.assertAll(expectedSuppliedDurations.stream().map(next -> () -> Assertions.assertEquals(next, supplier.get())));
         }
     }

@@ -27,7 +27,7 @@ import static com.redfin.validity.Validity.validate;
  * amount of time. This allows for customization of how a thread is made to sleep.
  */
 @FunctionalInterface
-public interface Sleep {
+public interface PatientSleep {
 
     /**
      * Make the current thread wait for the given amount of milliseconds and nanoseconds.

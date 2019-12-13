@@ -31,26 +31,26 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Stream;
 
-@DisplayName("When an IgnoringExecutionHandler")
-final class IgnoringExecutionHandlerTest
-    extends AbstractExecutionHandlerTest<IgnoringExecutionHandler> {
+@DisplayName("When an IgnoringPatientExecutionHandler")
+final class IgnoringPatientExecutionHandlerTest
+    extends AbstractExecutionHandlerTest<IgnoringPatientExecutionHandler> {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Test constants, requirements, and helpers
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     @Override
-    public IgnoringExecutionHandler getInstance() {
+    public IgnoringPatientExecutionHandler getInstance() {
         return getInstance(Collections.emptyList());
     }
 
-    private IgnoringExecutionHandler getInstance(Collection<Class<? extends Throwable>> ignoredThrowableTypes) {
-        return new IgnoringExecutionHandler(ignoredThrowableTypes);
+    private IgnoringPatientExecutionHandler getInstance(Collection<Class<? extends Throwable>> ignoredThrowableTypes) {
+        return new IgnoringPatientExecutionHandler(ignoredThrowableTypes);
     }
 
-    private IgnoringExecutionHandler getInstance(Collection<Class<? extends Throwable>> ignoredThrowableTypes,
-                                                 Collection<Class<? extends Throwable>> notIgnoredThrowableTypes) {
-        return new IgnoringExecutionHandler(ignoredThrowableTypes, notIgnoredThrowableTypes);
+    private IgnoringPatientExecutionHandler getInstance(Collection<Class<? extends Throwable>> ignoredThrowableTypes,
+                                                        Collection<Class<? extends Throwable>> notIgnoredThrowableTypes) {
+        return new IgnoringPatientExecutionHandler(ignoredThrowableTypes, notIgnoredThrowableTypes);
     }
 
     static final class ValidIgnoredCollections
